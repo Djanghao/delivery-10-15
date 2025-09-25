@@ -1,0 +1,246 @@
+{
+  "area_code": "330354",
+  "total_projects": 20,
+  "projects": [
+    {
+      "projectuuid": "887ab838e18d4b6ab7b936bc83ecab49",
+      "project_name": "温州市核心片区黄屿单元C-04a地块建设项目",
+      "project_code": "2305-330391-04-01-283031",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "dd69647dd9794087af51093fd77355d8",
+          "deal_time": "2023-05-04 08:48:14.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "7b48225d25a74cb2b12aa3f4e39b5ce0",
+      "project_name": "温州生态园三垟湿地市树市花园附属配套工程",
+      "project_code": "2020-330391-48-03-158734",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "205b5f281f774392bc4eb78dbe4b3c4f",
+          "deal_time": "2020-08-20 17:02:48.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "bb22557835ef4291a2d8ea4bab60209e",
+      "project_name": "温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）三期",
+      "project_code": "2504-330354-04-01-895169",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "d4b0b4ad50344f33aed3149ae109f5ba",
+          "deal_time": "2025-04-16 11:39:28.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "53ec736013c746efabcf59c3950b4367",
+      "project_name": "温州生态园三垟湿地西北片生态景观建设项目二期",
+      "project_code": "2504-330354-04-01-850748",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "3463a501209d415db021c18b855c7cbd",
+          "deal_time": "2025-04-16 12:03:09.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "1638536dfe5a4e8ab951a1950f0cb966",
+      "project_name": "温州生态园三垟湿地西北片生态景观建设项目一期",
+      "project_code": "2408-330354-04-01-778173",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "7123db377bfe4f38b46852921cdcaff5",
+          "deal_time": "2024-08-19 15:10:06.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "049340da4f3e49219c9e6ecab9ec7f29",
+      "project_name": "温州生态园三垟湿地西北片生态景观建设项目三期",
+      "project_code": "2505-330354-04-01-274607",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "0545a65f7e8a484cb19b16107517273f",
+          "deal_time": "2025-05-29 15:01:44.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "8bfaffb9fd9d4c809717dfca63a6e403",
+      "project_name": "温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）四期",
+      "project_code": "2505-330354-04-01-626903",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "bf024e26cf8d4ee6bc9ec358081103f2",
+          "deal_time": "2025-05-29 09:39:04.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "0128e08c07c34cdcaf3290ecb36d959f",
+      "project_name": "温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）二期",
+      "project_code": "2504-330354-04-01-938558",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "51b9e7aaddd04951b38970e9b6f887d8",
+          "deal_time": "2025-04-16 11:39:54.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "f215e9917cec40b7985074bffed99baa",
+      "project_name": "温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）一期",
+      "project_code": "2408-330354-04-01-224278",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "4173d28218d54c9bb7b932dc3b91a345",
+          "deal_time": "2024-08-05 10:35:29.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "ae2233a28649474aa4891525e283ff6b",
+      "project_name": "温州生态园三垟湿地罗西光伏储能项目（储能部分）",
+      "project_code": "2505-330354-04-01-930103",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "f5b23eb3c51644d79888dbfcbf91eabf",
+          "deal_time": "2025-05-12 10:33:36.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "3a92621c47394e268860a68248936677",
+      "project_name": "温州生态园三垟湿地北出入口东侧地下室配套工程",
+      "project_code": "2311-330354-04-01-584770",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "b318562da8d04534905c6468e94b3f71",
+          "deal_time": "2023-11-29 17:16:09.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "f89550e07d094c029ac3706aeb552851",
+      "project_name": "瓯海区三垟街道汤家桥S1线桥下公园工程-体育休闲公园项目",
+      "project_code": "2211-330391-04-01-172304",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "4503a98b00a3466a8ab0433668635618",
+          "deal_time": "2022-11-11 10:42:28.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "8cf1317e226743c09390e9f518d85b6a",
+      "project_name": "温州生态园罗西住宅区十组团营业房分隔工程",
+      "project_code": "2506-330354-04-01-732713",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "94523110b8d84a4ca7e11918f36585ad",
+          "deal_time": "2025-06-13 15:42:51.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "7cfd910bb9be4e798c6463d00d922185",
+      "project_name": "温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）五期",
+      "project_code": "2505-330354-04-01-271115",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "4d84efd5fc114e1c951b5acad7e9bd84",
+          "deal_time": "2025-05-29 09:39:21.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "c12b96f3bc7643b9b3bdabb582777332",
+      "project_name": "车和家（温州）能源服务有限公司温州太一君澜酒店停车场充电桩项目",
+      "project_code": "2505-330354-04-01-399467",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "7b1280612fa64299bd10de3d0085fc57",
+          "deal_time": "2025-05-20 10:55:59.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "d99ecf923dd3431485ba553995841017",
+      "project_name": "温州瓯柑杨梅产业综合服务中心",
+      "project_code": "2308-330354-04-01-803897",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "333bfdb043334acf8d02fa354500a363",
+          "deal_time": "2023-08-28 14:19:35.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "474f3ca8b2b64135ae262e93830403e8",
+      "project_name": "温州生态园三垟湿地西入口配套及地下人防工程",
+      "project_code": "2020-330391-48-03-162041",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "d2a6a0246aa24796849cc0231aaed304",
+          "deal_time": "2020-09-01 17:26:50.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "831ac8a7067947e49f4cbf24f1fbc296",
+      "project_name": "温州生态园三垟湿地罗西光伏储能项目（光伏部分）",
+      "project_code": "2504-330354-04-01-728948",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "a2269e519dcd4388b6518ec500050ba8",
+          "deal_time": "2025-04-07 11:30:03.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "4b707508bd444e5e8c0c208d9d5ea981",
+      "project_name": "温州生态园西入口建设工程三垟湿地A-08-02b地块新增绿化管理用房项目",
+      "project_code": "2503-330354-04-01-703864",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "b4bf95bdada142818d7d1dfef3e7c9f5",
+          "deal_time": "2025-03-21 08:18:57.0"
+        }
+      ]
+    },
+    {
+      "projectuuid": "0ca44f7d00474e1f847b271457bfd852",
+      "project_name": "温州状元街道三郎桥A02-a地块综合办公楼建设工程",
+      "project_code": "2019-330391-47-03-831266",
+      "matches": [
+        {
+          "item_name": "企业投资（含外商投资）项目备案（基本建设）",
+          "sendid": "3b00aa64336a47a6a05b39b2b652b8d7",
+          "deal_time": "2021-03-04 10:08:30.0"
+        }
+      ]
+    }
+  ]
+}
