@@ -3,7 +3,6 @@
 import { App as AntdApp, ConfigProvider, theme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import type { ReactNode } from 'react';
-import 'antd/dist/reset.css';
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
