@@ -1,3 +1,11 @@
 backup/
 .claude
 __pycache__
+frontend/node_modules
+frontend/.next
+frontend/.turbo
+frontend/out
+backend/.venv
+backend/data/*.db
+*.sqlite3
+.DS_Store
