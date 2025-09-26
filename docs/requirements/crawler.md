@@ -63,7 +63,7 @@ CREATE TABLE crawl_progress (
 
    * 如果 `projectuuid` 已在 `valuable_projects` → 跳过。
    * 否则：请求项目详情页（接口：`projectDetail`），遍历事项：
-     * 如果发现目标监管类型 → 项目写入 `valuable_projects`。
+     * @docs/requirements/req-1.md:3.3 关注监管类型的事项筛选, 进而项目筛选, 如果发现目标监管类型 → 项目写入 `valuable_projects`。
    * **随时更新 pivot = 当前 SENDID**。
 4. 该地区历史爬取完成后，`crawl_progress.last_pivot_sendid = 最新 SENDID`。
 

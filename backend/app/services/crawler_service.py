@@ -37,7 +37,16 @@ class CrawlerService:
         for node in nodes.values():
             if node.parent_id and node.parent_id in nodes:
                 nodes[node.parent_id].children.append(node)
-        return [node for node in nodes.values() if not node.parent_id]
+        # 返回市级作为顶层（去掉省级）。
+        roots = [node for node in nodes.values() if not node.parent_id]
+        if not roots:
+            # 兜底：如果没有根结点，按原结构返回全部根（保持兼容）
+            return [node for node in nodes.values() if not node.parent_id]
+        city_level: List[RegionNode] = []
+        for root in roots:
+            # 仅返回根结点（省级）的子结点（市级）
+            city_level.extend(root.children)
+        return city_level
 
     def run_task(self, session: Session, mode: str, region_codes: List[str]) -> CrawlRun:
         run_id = str(uuid.uuid4())
