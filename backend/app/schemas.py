@@ -1,40 +1,64 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from datetime import datetime
 from typing import List, Literal, Optional
 
+from pydantic import BaseModel, Field
 
-class StartCrawlRequest(BaseModel):
+
+class RegionNode(BaseModel):
+    id: str
+    name: str
+    parent_id: Optional[str] = Field(None, alias="pId")
+    children: List["RegionNode"] = Field(default_factory=list)
+
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+    }
+
+
+class CrawlStartRequest(BaseModel):
     mode: Literal["history", "incremental"]
-    regions: List[str] = Field(default_factory=list)
+    regions: List[str]
 
 
-class StartCrawlResponse(BaseModel):
-    job_id: str
-    message: str
+class CrawlStartResponse(BaseModel):
+    task_id: str
+
+
+class TaskStatus(BaseModel):
+    task_id: str
+    status: Literal["pending", "running", "succeeded", "failed"]
+    message: Optional[str] = None
 
 
 class ProjectItem(BaseModel):
     projectuuid: str
     project_name: str
     region_code: str
+    discovered_at: datetime
 
 
-class ProjectListResponse(BaseModel):
+class PaginatedProjects(BaseModel):
     items: List[ProjectItem]
     total: int
     page: int
     size: int
 
 
-class ProgressResponse(BaseModel):
-    region_code: str
-    last_pivot_sendid: Optional[str] = None
-    updated_at: Optional[str] = None
-
-
-class RegionNode(BaseModel):
+class CrawlRunItem(BaseModel):
     id: str
-    pId: Optional[str] = None
-    name: str
+    mode: str
+    regions: List[str]
+    region_count: int
+    total_items: int
+    valuable_projects: int
+    started_at: datetime
+    finished_at: Optional[datetime]
 
+
+class LogEntry(BaseModel):
+    timestamp: datetime
+    level: str
+    message: str

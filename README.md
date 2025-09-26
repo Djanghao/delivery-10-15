@@ -1,37 +1,70 @@
 # 审批管理系统爬取平台
 
-简洁全栈实现：FastAPI 后端 + Next.js 前端（shadcn 风格），按文档要求实现人工触发爬取、项目存储与查询、导出、历史进度等。
+一个具备全流程控制的浙江审批项目爬取平台，包含 FastAPI 后端服务与 Next.js + Ant Design 前端控制台。开发按 `docs/requirements` 与参考爬虫实现。
 
-## 结构
+## 目录结构
 
-- `backend/` FastAPI 服务与爬虫逻辑（Python venv）
-- `frontend/` Next.js 管理台（App Router + Tailwind）
-- `docs/` 参考与需求文档
+- `backend/` FastAPI 服务与爬虫调度
+- `frontend/` Next.js 前端
+- `data/` SQLite 数据库与日志文件（运行时生成）
+- `docs/` 需求与参考资料
 
-## 后端
+## 后端（FastAPI）
 
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
+1. **创建虚拟环境**
+   ```bash
+   cd backend
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+2. **启动服务**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
-接口见 `backend/README.md`。
+### 关键接口
 
-## 前端
+- `GET /api/regions` 地区树
+- `POST /api/crawl/start` 启动历史/增量任务
+- `GET /api/crawl/status` 当前任务状态
+- `GET /api/crawl/runs` 任务历史摘要
+- `GET /api/projects` 命中项目分页列表
+- `GET /api/projects/export` 项目导出（支持多地区）
+- `GET /api/logs` / `DELETE /api/logs` 日志查看与清空
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+日志存储在 `data/logs/crawler.log`，任务运行数据写入 `data/app.db`。
 
-默认后端地址 `http://localhost:8000`，如需修改：设置 `NEXT_PUBLIC_API_BASE` 环境变量。
+## 前端（Next.js + Ant Design）
 
-## 注意
+1. 安装依赖
+   ```bash
+   cd frontend
+   npm install
+   ```
+2. 启动开发服务
+   ```bash
+   npm run dev
+   ```
+3. 如需与后端联调，请在 `.env.local` 中配置：
+   ```ini
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+   ```
 
-- Python 使用 venv，不使用 conda。
-- 数据库存于 `backend/data/app.db`。
-- UI 中文，Twitter 风格，使用简化的 shadcn 风格组件。
+### 功能速览
+
+- 左侧侧边菜单切换“数据爬取 / 爬取结果”两大页面
+- 数据爬取页：
+  - 地区树多选（自动加载城市/区县）
+  - 历史 / 增量模式切换
+  - 实时日志终端 + 最近任务列表
+- 爬取结果页：
+  - 地区筛选 + CSV 导出
+  - 命中项目表格（Ant Design Table）
+  - 任务执行摘要（模式 / 地区数 / 事项数 / 合格项目数）
+
+## 注意事项
+
+- 网络访问受限环境下，爬虫可能无法直接访问浙江政务平台，请提前确认出口策略。
+- 任务执行日志写入文件，无需额外数据库表，保持目录整洁即可。
+- 如需扩展自动调度，可在 `backend/app/services/task_manager.py` 中引入定时器/消息队列。
