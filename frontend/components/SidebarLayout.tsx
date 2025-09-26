@@ -1,25 +1,28 @@
 'use client';
 
-import { Layout, Menu, Typography } from 'antd';
-import {
-  ApartmentOutlined,
-  DashboardOutlined,
-  TableOutlined,
-} from '@ant-design/icons';
+import { Button, Layout, Menu, Typography } from 'antd';
+import { DashboardOutlined, TableOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 
 const { Header, Sider, Content } = Layout;
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const selectedKeys = pathname === '/results' ? ['/results'] : ['/'];
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <Layout className="app-shell">
       <Sider
         width={220}
+        collapsible
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        collapsedWidth={64}
+        breakpoint="lg"
+        trigger={null}
         style={{
           background: '#ffffff',
           borderRight: '1px solid #e6ecf0',
@@ -29,17 +32,21 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
-            padding: '24px 16px 16px',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            padding: '16px 12px',
+            minHeight: 64,
           }}
         >
-          <ApartmentOutlined style={{ fontSize: 24, color: '#1DA1F2' }} />
-          <Typography.Title level={4} style={{ margin: 0 }}>
-            审批爬取
-          </Typography.Title>
+          <Button
+            type="text"
+            aria-label={collapsed ? '展开侧边栏' : '收起侧边栏'}
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed((c) => !c)}
+          />
         </div>
         <Menu
           mode="inline"
+          inlineCollapsed={collapsed}
           selectedKeys={selectedKeys}
           items={[
             {
@@ -59,21 +66,40 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
       <Layout>
         <Header
           style={{
-            background: '#ffffffcc',
-            backdropFilter: 'blur(12px)',
+            background: '#ffffff',
             borderBottom: '1px solid #e6ecf0',
             padding: '0 24px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
+            gap: 16,
+            height: 80,
           }}
         >
-          <Typography.Title level={3} style={{ margin: 0, color: '#15202b' }}>
-            浙江审批项目智能爬取平台
-          </Typography.Title>
-          <Typography.Text type="secondary">内测版本</Typography.Text>
+          <a
+            href="https://tzxm.zjzwfw.gov.cn/tzxmweb/zwtpages/resultsPublicity/notice_of_publicity_new.html"
+            target="_blank"
+            rel="noreferrer"
+            style={{ display: 'flex', alignItems: 'center' }}
+            aria-label="浙江政务服务网"
+            title="浙江政务服务网"
+          >
+            <img
+              src="https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web1/site/script/zjservice/resources/index1/newImg/zjzwLogo.png"
+              alt="浙江政务服务网"
+              style={{ height: 44, width: 'auto', borderRadius: 10, display: 'block', objectFit: 'contain' }}
+            />
+          </a>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+            <Typography.Title level={4} style={{ margin: 0, color: '#374151', fontWeight: 700 }}>
+              投资项目在线审批监管平台
+            </Typography.Title>
+            <Typography.Title level={4} style={{ margin: 0, color: '#374151', fontWeight: 700 }}>
+              工程建设项目审批爬取系统
+            </Typography.Title>
+          </div>
         </Header>
-        <Content style={{ padding: '24px 32px', minHeight: 'calc(100vh - 64px)' }}>
+        <Content style={{ padding: '24px 32px', minHeight: 'calc(100vh - 80px)' }}>
           <div className="page-container">{children}</div>
         </Content>
       </Layout>

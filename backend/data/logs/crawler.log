@@ -1,2 +1,107 @@
-{"timestamp": "2025-09-26T02:50:41.090371Z", "level": "INFO", "message": "任务 c1737f7a-7b1a-43be-a1b4-66e8d4ac63dc 开始，模式 history，地区 330354"}
-{"timestamp": "2025-09-26T02:50:41.090579Z", "level": "INFO", "message": "地区 330354 历史爬取开始"}
+{"timestamp": "2025-09-26T04:29:48.524244Z", "level": "INFO", "message": "日志已清空"}
+{"timestamp": "2025-09-26T04:29:52.403908Z", "level": "INFO", "message": "任务 055541bc-3dd1-46db-90aa-c8dc77a0d4e5 开始，模式 history，地区 330354"}
+{"timestamp": "2025-09-26T04:29:52.404039Z", "level": "INFO", "message": "地区 330354 历史爬取开始"}
+{"timestamp": "2025-09-26T04:31:08.666579Z", "level": "DEBUG", "message": "处理事项 60d1664c29cd42ee93ab7ebde25d0559 项目 ba67803fd662484d8d09fa47819422f0"}
+{"timestamp": "2025-09-26T04:31:09.295544Z", "level": "DEBUG", "message": "处理事项 7b35e89a74ac4c7a884a24be0f2db408 项目 672248e7620e452c9f959c6a112c46ed"}
+{"timestamp": "2025-09-26T04:31:10.919898Z", "level": "DEBUG", "message": "处理事项 3313d7a9ca094454a3553603cab4f87e 项目 381f9925b71346f49c29cd5b57660445"}
+{"timestamp": "2025-09-26T04:31:11.604110Z", "level": "DEBUG", "message": "处理事项 577f23996db84ff1b5d24df07ec2dd2b 项目 e6c20a04662048cf9e39b959192e4d28"}
+{"timestamp": "2025-09-26T04:31:12.277106Z", "level": "DEBUG", "message": "处理事项 a3a413212daa444d98beae794ca968b0 项目 ea88d33979a1407baa641b5d0f7c2b6f"}
+{"timestamp": "2025-09-26T04:31:13.071842Z", "level": "DEBUG", "message": "处理事项 9413489b62e04926b0f7c342af76f276 项目 c8d305c4cbec4c07a74df21ada341553"}
+{"timestamp": "2025-09-26T04:31:13.789932Z", "level": "DEBUG", "message": "处理事项 f9cb35c9d14f4ac7a37e349f05cd1fb2 项目 2019-330303-47-01-028420-000"}
+{"timestamp": "2025-09-26T04:31:14.474589Z", "level": "DEBUG", "message": "处理事项 3e9dd32cfb7b47ca9bfa6bafd54cbe2f 项目 ea88d33979a1407baa641b5d0f7c2b6f"}
+{"timestamp": "2025-09-26T04:31:15.286095Z", "level": "DEBUG", "message": "处理事项 ea47b8440f344963a9a76c222e3072b0 项目 e6c20a04662048cf9e39b959192e4d28"}
+{"timestamp": "2025-09-26T04:31:15.943235Z", "level": "DEBUG", "message": "处理事项 89d180a411204bbba5688e50d353d9d8 项目 f9719dafc48a49e5bfeed807df3e84da"}
+{"timestamp": "2025-09-26T04:31:16.604022Z", "level": "DEBUG", "message": "处理事项 b983f08f582544e88e0ed598efc139d9 项目 ea88d33979a1407baa641b5d0f7c2b6f"}
+{"timestamp": "2025-09-26T04:31:17.392941Z", "level": "DEBUG", "message": "处理事项 3cab4ecc91a24117820c89dcff512b20 项目 c85c405a1735446a86b93a09a190363c"}
+{"timestamp": "2025-09-26T04:31:19.009504Z", "level": "DEBUG", "message": "处理事项 f9a82982207c4f02bdeaf32124cd4991 项目 d99ecf923dd3431485ba553995841017"}
+{"timestamp": "2025-09-26T04:31:19.766653Z", "level": "INFO", "message": "记录项目  - 温州瓯柑杨梅产业综合服务中心"}
+{"timestamp": "2025-09-26T04:31:19.768102Z", "level": "DEBUG", "message": "处理事项 77a19378e67e47fba30b14cbbb7e1cb7 项目 d99ecf923dd3431485ba553995841017"}
+{"timestamp": "2025-09-26T04:31:19.768961Z", "level": "DEBUG", "message": "处理事项 ba48c90bbc5349aaba10989d0ca8c4b6 项目 474f3ca8b2b64135ae262e93830403e8"}
+{"timestamp": "2025-09-26T04:31:20.404628Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地西入口配套及地下人防工程"}
+{"timestamp": "2025-09-26T04:31:20.406103Z", "level": "DEBUG", "message": "处理事项 4b6bc91d1c284ef8a654a671228cd8c7 项目 2b8ceae594db46a39bde715ba515c3ca"}
+{"timestamp": "2025-09-26T04:31:21.040614Z", "level": "DEBUG", "message": "处理事项 082ff500dc6b4cb09b755fa287f1ef04 项目 0ca44f7d00474e1f847b271457bfd852"}
+{"timestamp": "2025-09-26T04:31:21.705933Z", "level": "INFO", "message": "记录项目  - 温州状元街道三郎桥A02-a地块综合办公楼建设工程"}
+{"timestamp": "2025-09-26T04:31:21.707918Z", "level": "DEBUG", "message": "处理事项 085fa512b6134c369dcbfe11fe9887ac 项目 2018-330300-78-01-056786-000"}
+{"timestamp": "2025-09-26T04:31:22.426202Z", "level": "DEBUG", "message": "处理事项 4e6d3141a3aa413694c30262777fdc3e 项目 2019-330303-47-01-028420-000"}
+{"timestamp": "2025-09-26T04:31:23.090070Z", "level": "DEBUG", "message": "处理事项 4b0a23ed1ff24e5bb670625a180572fe 项目 aebe86f5e05748a88ffd562544112155"}
+{"timestamp": "2025-09-26T04:31:23.926476Z", "level": "DEBUG", "message": "处理事项 8328b4bcdca346d884cad612890b7d6f 项目 2019-330303-47-01-028420-000"}
+{"timestamp": "2025-09-26T04:31:24.700808Z", "level": "DEBUG", "message": "处理事项 99424d9e239b40d3a22a1bd31bfa998f 项目 2018-330300-78-01-015200-000"}
+{"timestamp": "2025-09-26T04:31:26.258430Z", "level": "DEBUG", "message": "处理事项 b4bf95bdada142818d7d1dfef3e7c9f5 项目 4b707508bd444e5e8c0c208d9d5ea981"}
+{"timestamp": "2025-09-26T04:31:27.101387Z", "level": "INFO", "message": "记录项目  - 温州生态园西入口建设工程三垟湿地A-08-02b地块新增绿化管理用房项目"}
+{"timestamp": "2025-09-26T04:31:27.102649Z", "level": "DEBUG", "message": "处理事项 4f85f9516a0c405897e4c2ba5ebf8cb5 项目 2019-330303-47-01-028420-000"}
+{"timestamp": "2025-09-26T04:31:27.739208Z", "level": "DEBUG", "message": "处理事项 c503aef0d4914e1995b4cc67576bada1 项目 66540926176445a6873b32cc81604c65"}
+{"timestamp": "2025-09-26T04:31:28.435800Z", "level": "DEBUG", "message": "处理事项 a2269e519dcd4388b6518ec500050ba8 项目 831ac8a7067947e49f4cbf24f1fbc296"}
+{"timestamp": "2025-09-26T04:31:29.141299Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地罗西光伏储能项目（光伏部分）"}
+{"timestamp": "2025-09-26T04:31:29.143448Z", "level": "DEBUG", "message": "处理事项 6d1be13671b44e77b3febf74df4e384e 项目 2018-330303-47-01-028640-000"}
+{"timestamp": "2025-09-26T04:31:29.819880Z", "level": "DEBUG", "message": "处理事项 fb2d79c68fdb442092170d9772e26e1d 项目 5712bb96d7d44fd28697ba39b6d51cb2"}
+{"timestamp": "2025-09-26T04:31:30.442561Z", "level": "DEBUG", "message": "处理事项 d4b0b4ad50344f33aed3149ae109f5ba 项目 bb22557835ef4291a2d8ea4bab60209e"}
+{"timestamp": "2025-09-26T04:31:31.092982Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）三期"}
+{"timestamp": "2025-09-26T04:31:31.094464Z", "level": "DEBUG", "message": "处理事项 51b9e7aaddd04951b38970e9b6f887d8 项目 0128e08c07c34cdcaf3290ecb36d959f"}
+{"timestamp": "2025-09-26T04:31:31.735255Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）二期"}
+{"timestamp": "2025-09-26T04:31:31.737137Z", "level": "DEBUG", "message": "处理事项 3463a501209d415db021c18b855c7cbd 项目 53ec736013c746efabcf59c3950b4367"}
+{"timestamp": "2025-09-26T04:31:32.453536Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地西北片生态景观建设项目二期"}
+{"timestamp": "2025-09-26T04:31:32.454950Z", "level": "DEBUG", "message": "处理事项 36105be29a1640aea3c514d14d9de528 项目 a2036ff97ebe41ec81b7c8e81060bfb1"}
+{"timestamp": "2025-09-26T04:31:33.979303Z", "level": "DEBUG", "message": "处理事项 48d66721fb0a48809580360c21f80afc 项目 474f3ca8b2b64135ae262e93830403e8"}
+{"timestamp": "2025-09-26T04:31:33.981439Z", "level": "DEBUG", "message": "处理事项 c7770d4e634b4ce6992da55d54956797 项目 d99ecf923dd3431485ba553995841017"}
+{"timestamp": "2025-09-26T04:31:33.982975Z", "level": "DEBUG", "message": "处理事项 a623495e4ca0420299ff443c3144401f 项目 fa475d34d091444f905184354c75fce6"}
+{"timestamp": "2025-09-26T04:31:34.626373Z", "level": "DEBUG", "message": "处理事项 f5b23eb3c51644d79888dbfcbf91eabf 项目 ae2233a28649474aa4891525e283ff6b"}
+{"timestamp": "2025-09-26T04:31:35.600752Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地罗西光伏储能项目（储能部分）"}
+{"timestamp": "2025-09-26T04:31:35.601871Z", "level": "DEBUG", "message": "处理事项 688f6464cb9c4feb90fee855ddb09d25 项目 5038889761aa453386e3f86fc8110236"}
+{"timestamp": "2025-09-26T04:31:36.234169Z", "level": "DEBUG", "message": "处理事项 7b1280612fa64299bd10de3d0085fc57 项目 c12b96f3bc7643b9b3bdabb582777332"}
+{"timestamp": "2025-09-26T04:31:36.871095Z", "level": "INFO", "message": "记录项目  - 车和家（温州）能源服务有限公司温州太一君澜酒店停车场充电桩项目"}
+{"timestamp": "2025-09-26T04:31:36.873409Z", "level": "DEBUG", "message": "处理事项 bf024e26cf8d4ee6bc9ec358081103f2 项目 8bfaffb9fd9d4c809717dfca63a6e403"}
+{"timestamp": "2025-09-26T04:31:37.534957Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）四期"}
+{"timestamp": "2025-09-26T04:31:37.536418Z", "level": "DEBUG", "message": "处理事项 4d84efd5fc114e1c951b5acad7e9bd84 项目 7cfd910bb9be4e798c6463d00d922185"}
+{"timestamp": "2025-09-26T04:31:38.178018Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）五期"}
+{"timestamp": "2025-09-26T04:31:38.179081Z", "level": "DEBUG", "message": "处理事项 0545a65f7e8a484cb19b16107517273f 项目 049340da4f3e49219c9e6ecab9ec7f29"}
+{"timestamp": "2025-09-26T04:31:38.812204Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地西北片生态景观建设项目三期"}
+{"timestamp": "2025-09-26T04:31:38.814931Z", "level": "DEBUG", "message": "处理事项 a96ac7d207f6481f810e98718903f3a8 项目 7b48225d25a74cb2b12aa3f4e39b5ce0"}
+{"timestamp": "2025-09-26T04:31:39.451369Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地市树市花园附属配套工程"}
+{"timestamp": "2025-09-26T04:31:40.411511Z", "level": "DEBUG", "message": "处理事项 4cee2676be8d4a85870fb5e440c2cd3e 项目 2018-330303-47-01-071005-000"}
+{"timestamp": "2025-09-26T04:31:41.130326Z", "level": "DEBUG", "message": "处理事项 b583a83516c745c899b3e8fe7c6c00f7 项目 2b8ceae594db46a39bde715ba515c3ca"}
+{"timestamp": "2025-09-26T04:31:41.780388Z", "level": "DEBUG", "message": "处理事项 2ce8b8e5cd594348b6fb832a1268e7f7 项目 694ca1120e3a4a728e10c64f59e2ea45"}
+{"timestamp": "2025-09-26T04:31:42.435104Z", "level": "DEBUG", "message": "处理事项 1a67a96d841d472a927abc9c08866b5e 项目 381f9925b71346f49c29cd5b57660445"}
+{"timestamp": "2025-09-26T04:31:43.076624Z", "level": "DEBUG", "message": "处理事项 526dedbacbc448b18e65e224b8f9b6ea 项目 2018-330300-47-01-068421-000"}
+{"timestamp": "2025-09-26T04:31:43.699516Z", "level": "DEBUG", "message": "处理事项 94523110b8d84a4ca7e11918f36585ad 项目 8cf1317e226743c09390e9f518d85b6a"}
+{"timestamp": "2025-09-26T04:31:44.349807Z", "level": "INFO", "message": "记录项目  - 温州生态园罗西住宅区十组团营业房分隔工程"}
+{"timestamp": "2025-09-26T04:31:44.352531Z", "level": "DEBUG", "message": "处理事项 838d8a8586d345928e6f714890f49feb 项目 f89550e07d094c029ac3706aeb552851"}
+{"timestamp": "2025-09-26T04:31:45.024839Z", "level": "INFO", "message": "记录项目  - 瓯海区三垟街道汤家桥S1线桥下公园工程-体育休闲公园项目"}
+{"timestamp": "2025-09-26T04:31:45.027094Z", "level": "DEBUG", "message": "处理事项 0492cc0aa20045e882d8e4a86ddf9009 项目 941d1be1bb354f66ba153e5bcfadc5d1"}
+{"timestamp": "2025-09-26T04:31:45.644049Z", "level": "DEBUG", "message": "处理事项 8d5f092b83554e11bd4bf51cc41de174 项目 a931e1c26b654bd0ab74e31cec742def"}
+{"timestamp": "2025-09-26T04:31:46.293703Z", "level": "DEBUG", "message": "处理事项 458dca542d4a11ef8b9e6c92bfce0fa2 项目 e198a8a7549c436ba3745b93f985b2c5"}
+{"timestamp": "2025-09-26T04:31:47.780519Z", "level": "DEBUG", "message": "处理事项 7e3f564c5cb04614919ab067c6ac6a16 项目 3a92621c47394e268860a68248936677"}
+{"timestamp": "2025-09-26T04:31:48.400236Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地北出入口东侧地下室配套工程"}
+{"timestamp": "2025-09-26T04:31:48.401523Z", "level": "DEBUG", "message": "处理事项 c63538382c19411eb76a559d762f21b7 项目 ae2233a28649474aa4891525e283ff6b"}
+{"timestamp": "2025-09-26T04:31:48.402595Z", "level": "DEBUG", "message": "处理事项 4d9d21027982458fbe2e1558a0d6f19d 项目 777bbc3043bf479d9014b8a0413229c0"}
+{"timestamp": "2025-09-26T04:31:49.112401Z", "level": "DEBUG", "message": "处理事项 1e8486f99bb94cc7b2679746ad45933c 项目 ba67803fd662484d8d09fa47819422f0"}
+{"timestamp": "2025-09-26T04:31:49.935508Z", "level": "DEBUG", "message": "处理事项 d19e7f7101954e64aadf0bbc16e61b26 项目 a2036ff97ebe41ec81b7c8e81060bfb1"}
+{"timestamp": "2025-09-26T04:31:50.581642Z", "level": "DEBUG", "message": "处理事项 36ee221957c9418d805298e649ff3582 项目 478c64a6837a47569e58f07409e1867a"}
+{"timestamp": "2025-09-26T04:31:51.262047Z", "level": "DEBUG", "message": "处理事项 fc109f16f860464496e93e5679c2b098 项目 a316780732984580a59637f820a2e04e"}
+{"timestamp": "2025-09-26T04:31:51.912947Z", "level": "DEBUG", "message": "处理事项 f578ae2ebb714cdcab51adc0c96d00c1 项目 f215e9917cec40b7985074bffed99baa"}
+{"timestamp": "2025-09-26T04:31:52.535876Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地明清古建筑文化园工程(西次入口与地下人防工程）一期"}
+{"timestamp": "2025-09-26T04:31:52.537213Z", "level": "DEBUG", "message": "处理事项 9f24a03ff1694eb6b2ae2e60d61c5baa 项目 0128e08c07c34cdcaf3290ecb36d959f"}
+{"timestamp": "2025-09-26T04:31:52.538228Z", "level": "DEBUG", "message": "处理事项 132bf455c4f3485987d0eab3d63a189e 项目 8bfaffb9fd9d4c809717dfca63a6e403"}
+{"timestamp": "2025-09-26T04:31:53.404106Z", "level": "DEBUG", "message": "处理事项 f45874b3a0d049578a630e2cf489a771 项目 049340da4f3e49219c9e6ecab9ec7f29"}
+{"timestamp": "2025-09-26T04:31:53.408511Z", "level": "DEBUG", "message": "处理事项 1fac684ae8614724a40947304adcd57a 项目 1638536dfe5a4e8ab951a1950f0cb966"}
+{"timestamp": "2025-09-26T04:31:54.113862Z", "level": "INFO", "message": "记录项目  - 温州生态园三垟湿地西北片生态景观建设项目一期"}
+{"timestamp": "2025-09-26T04:31:54.115794Z", "level": "DEBUG", "message": "处理事项 8839ab9ff53d42d89d66ee2bfebc4f5b 项目 53ec736013c746efabcf59c3950b4367"}
+{"timestamp": "2025-09-26T04:31:54.117258Z", "level": "DEBUG", "message": "处理事项 b56aef8883524a33b72259df25d75e91 项目 bb22557835ef4291a2d8ea4bab60209e"}
+{"timestamp": "2025-09-26T04:31:54.118632Z", "level": "DEBUG", "message": "处理事项 137c2f685e0211efa1ba6c92bfce0fa2 项目 002e20d1055d46cb888f10e0b11a6805"}
+{"timestamp": "2025-09-26T04:31:54.775774Z", "level": "DEBUG", "message": "处理事项 3ce88bc2568842909a830fb033fdd60e 项目 c85c405a1735446a86b93a09a190363c"}
+{"timestamp": "2025-09-26T04:31:55.453488Z", "level": "DEBUG", "message": "处理事项 7a840e89dc9f44e48646b8c27aea0f70 项目 c85c405a1735446a86b93a09a190363c"}
+{"timestamp": "2025-09-26T04:31:56.130952Z", "level": "DEBUG", "message": "处理事项 ee80f77ce54542c48f9ee857673609f6 项目 381f9925b71346f49c29cd5b57660445"}
+{"timestamp": "2025-09-26T04:31:56.821060Z", "level": "DEBUG", "message": "处理事项 1832400fb63a44b6b80d3a152b417660 项目 887ab838e18d4b6ab7b936bc83ecab49"}
+{"timestamp": "2025-09-26T04:31:57.491686Z", "level": "INFO", "message": "记录项目  - 温州市核心片区黄屿单元C-04a地块建设项目"}
+{"timestamp": "2025-09-26T04:31:57.492888Z", "level": "DEBUG", "message": "处理事项 ee5552f2c28642cb8d15f39490508f60 项目 7b48225d25a74cb2b12aa3f4e39b5ce0"}
+{"timestamp": "2025-09-26T04:31:58.366515Z", "level": "DEBUG", "message": "处理事项 55d258cda9e44e31a305c2d2a7aa85a8 项目 887ab838e18d4b6ab7b936bc83ecab49"}
+{"timestamp": "2025-09-26T04:31:58.368017Z", "level": "DEBUG", "message": "处理事项 9b02976dcbf911efa9af6c92bf669f5e 项目 381f9925b71346f49c29cd5b57660445"}
+{"timestamp": "2025-09-26T04:31:59.045199Z", "level": "DEBUG", "message": "处理事项 e0f95e9395f447508a559621f23f36ec 项目 a316780732984580a59637f820a2e04e"}
+{"timestamp": "2025-09-26T04:31:59.710925Z", "level": "DEBUG", "message": "处理事项 807dd7f25b8c4a289ffc9504d42a9654 项目 478c64a6837a47569e58f07409e1867a"}
+{"timestamp": "2025-09-26T04:32:00.416272Z", "level": "DEBUG", "message": "处理事项 f9994d4269d6402db6caa2c75bf959de 项目 887ab838e18d4b6ab7b936bc83ecab49"}
+{"timestamp": "2025-09-26T04:32:00.417442Z", "level": "DEBUG", "message": "处理事项 1948efcfe2714ad4b1a003d8322fb09a 项目 887ab838e18d4b6ab7b936bc83ecab49"}
+{"timestamp": "2025-09-26T04:32:00.418346Z", "level": "DEBUG", "message": "处理事项 8c7551c8d06349a093940749c65a8f80 项目 b28b1917b18347aeaf0fb52d384fa5e5"}
+{"timestamp": "2025-09-26T04:32:01.077787Z", "level": "DEBUG", "message": "处理事项 2b77a593e65144ef8913f441b9c3ed3a 项目 fa475d34d091444f905184354c75fce6"}
+{"timestamp": "2025-09-26T04:32:01.753897Z", "level": "DEBUG", "message": "处理事项 b26659e113bc484395b7f12db4480956 项目 5038889761aa453386e3f86fc8110236"}
+{"timestamp": "2025-09-26T04:32:02.389047Z", "level": "DEBUG", "message": "处理事项 e07df80a885f4b2683e86874206dafdc 项目 becc7736867f49d68a087ef028d4cc46"}
+{"timestamp": "2025-09-26T04:32:03.055069Z", "level": "INFO", "message": "地区 330354 历史爬取完成"}
+{"timestamp": "2025-09-26T04:32:03.056595Z", "level": "INFO", "message": "任务 055541bc-3dd1-46db-90aa-c8dc77a0d4e5 完成，累计事项 82，命中项目 20"}
