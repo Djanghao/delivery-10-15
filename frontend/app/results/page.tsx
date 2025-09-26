@@ -155,7 +155,10 @@ export default function ResultsPage() {
       <Card className="card" style={{ padding: 24 }}>
         <Row gutter={32}>
           <Col xs={24} md={12} lg={10}>
-            <RegionTree value={selectedRegions} onChange={setSelectedRegions} />
+            <Space direction="vertical" size={12} style={{ width: '100%' }}>
+              <Typography.Text strong>地区选择</Typography.Text>
+              <RegionTree value={selectedRegions} onChange={setSelectedRegions} />
+            </Space>
           </Col>
           <Col xs={24} md={12} lg={14}>
             <Space direction="vertical" size={16} style={{ width: '100%' }}>

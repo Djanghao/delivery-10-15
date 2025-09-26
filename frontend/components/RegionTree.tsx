@@ -51,7 +51,6 @@ export default function RegionTree({ value, onChange }: Props) {
 
   return (
     <div>
-      <Typography.Text strong>地区筛选</Typography.Text>
       <div
         style={{
           maxHeight: 320,
