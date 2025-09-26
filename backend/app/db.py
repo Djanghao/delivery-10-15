@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from pathlib import Path
 from typing import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-DATABASE_URL = f"sqlite:///{(DATA_DIR / 'app.db').as_posix()}"
+from .config import DATABASE_URL
 
 engine = create_engine(
     DATABASE_URL,

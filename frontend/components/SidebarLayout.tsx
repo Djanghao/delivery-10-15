@@ -56,7 +56,6 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
         </div>
         <Menu
           mode="inline"
-          inlineCollapsed={collapsed}
           selectedKeys={selectedKeys}
           items={[
             {

@@ -2,13 +2,10 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from pathlib import Path
 from typing import List
 
 from ..schemas import LogEntry
-
-LOG_FILE = Path(__file__).resolve().parents[2] / "data" / "logs" / "crawler.log"
-LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+from ..config import LOG_FILE
 
 
 def append_log(level: str, message: str) -> None:
