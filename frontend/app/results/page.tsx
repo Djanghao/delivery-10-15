@@ -1,11 +1,10 @@
 'use client';
 
-import { App, Button, Card, Col, Flex, Row, Space, Table, Tag, Typography } from 'antd';
+import { App, Button, Card, Col, Flex, Row, Space, Table, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { DownloadOutlined, FilterOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../../components/RegionTree';
-import type { CrawlRunItem } from '../../components/RunHistoryList';
 import { apiFetch, API_BASE } from '../../lib/api';
 
 interface ProjectItem {
@@ -30,13 +29,6 @@ export default function ResultsPage() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({ current: 1, pageSize: 20, total: 0 });
   const [loading, setLoading] = useState(false);
-  const [runs, setRuns] = useState<CrawlRunItem[]>([]);
-
-  const loadRuns = useCallback(async () => {
-    const data = await apiFetch<CrawlRunItem[]>(`/api/crawl/runs`);
-    setRuns(data);
-  }, []);
-
   const loadProjects = useCallback(
     async (page = pagination.current ?? 1, pageSize = pagination.pageSize ?? 20) => {
       setLoading(true);
@@ -55,10 +47,6 @@ export default function ResultsPage() {
     [pagination.current, pagination.pageSize, selectedRegions],
   );
 
-  useEffect(() => {
-    loadRuns();
-  }, [loadRuns]);
-
   const handleFilter = async () => {
     if (selectedRegions.length === 0) {
       message.warning('请选择需要查看的地区');
@@ -70,13 +58,6 @@ export default function ResultsPage() {
   const handleTableChange = async (pager: TablePaginationConfig) => {
     await loadProjects(pager.current ?? 1, pager.pageSize ?? 20);
   };
-
-  const selectedRuns = useMemo(() => {
-    if (selectedRegions.length === 0) {
-      return runs;
-    }
-    return runs.filter((run) => run.regions.some((id) => selectedRegions.includes(id)));
-  }, [runs, selectedRegions]);
 
   const columns: ColumnsType<ProjectItem> = [
     {
@@ -101,36 +82,6 @@ export default function ResultsPage() {
       dataIndex: 'discovered_at',
       key: 'discovered_at',
       render: (value: string) => new Date(value).toLocaleString('zh-CN', { hour12: false }),
-    },
-  ];
-
-  const runColumns: ColumnsType<CrawlRunItem> = [
-    {
-      title: '开始时间',
-      dataIndex: 'started_at',
-      render: (value: string) => new Date(value).toLocaleString('zh-CN', { hour12: false }),
-    },
-    {
-      title: '结束时间',
-      dataIndex: 'finished_at',
-      render: (value?: string | null) => (value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '进行中'),
-    },
-    {
-      title: '模式',
-      dataIndex: 'mode',
-      render: (value: Mode) => <Tag color={value === 'history' ? 'blue' : 'cyan'}>{value === 'history' ? '历史' : '增量'}</Tag>,
-    },
-    {
-      title: '地区数量',
-      dataIndex: 'region_count',
-    },
-    {
-      title: '处理事项数',
-      dataIndex: 'total_items',
-    },
-    {
-      title: '命中项目数',
-      dataIndex: 'valuable_projects',
     },
   ];
 
@@ -186,17 +137,7 @@ export default function ResultsPage() {
         />
       </Card>
 
-      <Card className="card" style={{ padding: 24 }}>
-        <Typography.Title level={4} style={{ marginBottom: 16 }}>
-          任务执行摘要
-        </Typography.Title>
-        <Table<CrawlRunItem>
-          columns={runColumns}
-          dataSource={selectedRuns}
-          rowKey="id"
-          pagination={{ pageSize: 5 }}
-        />
-      </Card>
+      {/* 任务执行摘要已移除 */}
     </Flex>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import { App, Button, Card, Col, Flex, Row, Segmented, Space, Tag, Typography } from 'antd';
-import { ThunderboltOutlined } from '@ant-design/icons';
+import { App, Alert, Button, Card, Col, Flex, Row, Space, Statistic, Typography } from 'antd';
+import { HistoryOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../components/RegionTree';
 import LogConsole, { LogEntry } from '../components/LogConsole';
@@ -13,12 +13,9 @@ interface TaskStatus {
   message?: string | null;
 }
 
-type CrawlMode = 'history' | 'incremental';
-
 export default function CrawlDashboard() {
   const { message } = App.useApp();
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  const [mode, setMode] = useState<CrawlMode>('history');
   const [submitting, setSubmitting] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [statuses, setStatuses] = useState<TaskStatus[]>([]);
@@ -43,12 +40,10 @@ export default function CrawlDashboard() {
     return () => clearInterval(timer);
   }, [refreshLogs, refreshStatuses]);
 
-  const activeTasks = useMemo(
-    () => statuses.filter((item) => item.status === 'pending' || item.status === 'running'),
-    [statuses],
-  );
+  const pendingCount = useMemo(() => statuses.filter((s) => s.status === 'pending').length, [statuses]);
+  const runningCount = useMemo(() => statuses.filter((s) => s.status === 'running').length, [statuses]);
 
-  const handleStart = async () => {
+  const handleStart = async (mode: 'history' | 'incremental') => {
     if (selectedRegions.length === 0) {
       message.warning('请先选择至少一个地区');
       return;
@@ -78,44 +73,60 @@ export default function CrawlDashboard() {
       <Card className="card" style={{ padding: 24 }}>
         <Row gutter={32}>
           <Col xs={24} md={12} lg={10}>
-            <RegionTree value={selectedRegions} onChange={setSelectedRegions} />
+            <Space direction="vertical" size={12} style={{ width: '100%' }}>
+              <Typography.Title level={5} style={{ margin: 0 }}>地区选择</Typography.Title>
+              <RegionTree value={selectedRegions} onChange={setSelectedRegions} />
+            </Space>
           </Col>
           <Col xs={24} md={12} lg={14}>
-            <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            <Space direction="vertical" size={18} style={{ width: '100%' }}>
               <div>
-                <Typography.Text strong>爬取模式</Typography.Text>
-                <Segmented
-                  style={{ marginTop: 12 }}
-                  block
-                  value={mode}
-                  onChange={(value) => setMode(value as CrawlMode)}
-                  options={[
-                    { label: '历史模式', value: 'history' },
-                    { label: '增量模式', value: 'incremental' },
-                  ]}
-                />
-              </div>
-              <Space size={12} wrap>
-                <Button
-                  type="primary"
-                  icon={<ThunderboltOutlined />}
-                  size="large"
-                  onClick={handleStart}
-                  loading={submitting}
-                >
-                  开始爬取
-                </Button>
-                <Space size={8} wrap>
-                  {activeTasks.map((task) => (
-                    <Tag key={task.task_id} color={task.status === 'running' ? 'blue' : 'gold'}>
-                      {task.status === 'running' ? '执行中' : '等待中'} #{task.task_id.slice(0, 6)}
-                    </Tag>
-                  ))}
+                <Typography.Title level={5} style={{ margin: 0 }}>任务控制</Typography.Title>
+                <Space style={{ marginTop: 12 }} wrap>
+                  <Button
+                    type="primary"
+                    icon={<HistoryOutlined />}
+                    size="large"
+                    onClick={() => handleStart('history')}
+                    loading={submitting}
+                  >
+                    历史爬取
+                  </Button>
+                  <Button
+                    type="primary"
+                    icon={<DeploymentUnitOutlined />}
+                    size="large"
+                    onClick={() => handleStart('incremental')}
+                    loading={submitting}
+                  >
+                    增量爬取
+                  </Button>
                 </Space>
-              </Space>
-              <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                选中城市时会自动包含其下属区县，可单独勾选或取消区县以细化范围。
-              </Typography.Paragraph>
+              </div>
+              <Row gutter={16}>
+                <Col span={12} sm={8}>
+                  <Card bordered={false} style={{ background: '#f7fbff' }}>
+                    <Statistic title="进行中" value={runningCount} valueStyle={{ color: '#1677ff' }} />
+                  </Card>
+                </Col>
+                <Col span={12} sm={8}>
+                  <Card bordered={false} style={{ background: '#fffaf5' }}>
+                    <Statistic title="等待中" value={pendingCount} valueStyle={{ color: '#fa8c16' }} />
+                  </Card>
+                </Col>
+              </Row>
+              {null}
+              <Alert
+                type="info"
+                showIcon
+                message="使用说明"
+                description={
+                  <span>
+                    先在左侧选择目标地区（勾选城市会自动包含下属区县，可按需增删），然后点击上方“历史爬取”或“增量爬取”按钮启动任务。
+                    历史爬取会补齐历史命中项目；增量爬取仅处理上次 pivot 之后的新增事项，快速捕捉最新变更。
+                  </span>
+                }
+              />
             </Space>
           </Col>
         </Row>
