@@ -68,3 +68,11 @@ class LogEntry(BaseModel):
     timestamp: datetime
     level: str
     message: str
+
+
+class DeleteProjectsRequest(BaseModel):
+    projectuuids: List[str]
+
+
+class DeleteByRegionsResponse(BaseModel):
+    deleted: int

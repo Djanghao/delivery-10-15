@@ -4,13 +4,13 @@ import csv
 import io
 from typing import List
 
-from fastapi import APIRouter, Depends, Query, Response
-from sqlalchemy import func, select
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from ...db import get_db
 from ...models import ValuableProject
-from ...schemas import PaginatedProjects, ProjectItem
+from ...schemas import PaginatedProjects, ProjectItem, DeleteProjectsRequest, DeleteByRegionsResponse
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -71,3 +71,24 @@ def export_projects(
         ])
     headers = {"Content-Disposition": "attachment; filename=valuable_projects.csv"}
     return Response(content=buffer.getvalue(), media_type="text/csv", headers=headers)
+
+
+@router.delete("", status_code=204)
+def delete_projects(payload: DeleteProjectsRequest, db: Session = Depends(get_db)) -> Response:
+    if not payload.projectuuids:
+        raise HTTPException(status_code=400, detail="必须提供要删除的项目uuid 列表")
+    stmt = delete(ValuableProject).where(ValuableProject.projectuuid.in_(payload.projectuuids))
+    db.execute(stmt)
+    db.commit()
+    return Response(status_code=204)
+
+
+@router.delete("/by-regions", response_model=DeleteByRegionsResponse)
+def delete_by_regions(regions: List[str] = Query(default_factory=list), db: Session = Depends(get_db)) -> DeleteByRegionsResponse:
+    if not regions:
+        raise HTTPException(status_code=400, detail="必须提供至少一个地区进行删除")
+    stmt = delete(ValuableProject).where(ValuableProject.region_code.in_(regions))
+    result = db.execute(stmt)
+    db.commit()
+    deleted = int(result.rowcount or 0)
+    return DeleteByRegionsResponse(deleted=deleted)

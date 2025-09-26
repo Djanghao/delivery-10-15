@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass
+import math
 from typing import Iterable, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -35,6 +36,7 @@ class ItemPage:
 
 class PublicAnnouncementClient:
     BASE_URL = "https://tzxm.zjzwfw.gov.cn/publicannouncement.do"
+    PAGE_SIZE = 10  # 官方接口每页固定返回 10 条
 
     def __init__(self, timeout: float = 10.0, headers: Optional[dict] = None) -> None:
         self.timeout = timeout
@@ -72,6 +74,8 @@ class PublicAnnouncementClient:
         return [Region.from_dict(item) for item in payload]
 
     def get_item_page(self, area_code: str, page_no: int) -> ItemPage:
+        # 接口 pageNo 实测支持从 0 开始（0..N-1）。
+        # 保持与服务层一致传入的页码语义（不强行更改）。
         data = {
             "pageFlag": "",
             "pageNo": str(page_no),
@@ -85,7 +89,10 @@ class PublicAnnouncementClient:
             raise ValueError("Empty response when requesting item list")
         content = payload[0]
         raw_items: Iterable[dict] = content.get("itemList", [])
-        total_pages = int(content.get("counts") or 0)
+        # 注意：接口返回的 counts 实际是总记录数，而非总页数
+        total_count = int(content.get("counts") or 0)
+        # 官方一页 10 条，计算总页数（至少为 1，当 total_count>0）
+        total_pages = math.ceil(total_count / self.PAGE_SIZE) if total_count > 0 else 0
         items = [ItemSummary.from_dict(item) for item in raw_items]
         return ItemPage(items=items, total_pages=total_pages)
 

@@ -28,6 +28,10 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
         style={{
           background: '#ffffff',
           borderRight: '1px solid #e6ecf0',
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          overflow: 'auto',
         }}
       >
         <div
@@ -37,6 +41,10 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
             justifyContent: collapsed ? 'center' : 'flex-start',
             padding: '16px 12px',
             minHeight: 64,
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            background: '#ffffff',
           }}
         >
           <Button

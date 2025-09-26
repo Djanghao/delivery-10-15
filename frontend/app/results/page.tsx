@@ -1,8 +1,8 @@
 'use client';
 
-import { App, Button, Card, Col, Flex, Row, Space, Table, Typography } from 'antd';
+import { App, Button, Card, Col, Flex, Popconfirm, Row, Space, Table, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { DownloadOutlined, FilterOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownloadOutlined, FilterOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../../components/RegionTree';
 import { apiFetch, API_BASE } from '../../lib/api';
@@ -29,6 +29,42 @@ export default function ResultsPage() {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({ current: 1, pageSize: 20, total: 0 });
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
+  const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
+
+  type RegionNode = { id: string; name: string; children?: RegionNode[] };
+  const flattenRegions = (nodes: RegionNode[], acc: Record<string, string> = {}): Record<string, string> => {
+    for (const n of nodes) {
+      acc[n.id] = n.name;
+      if (n.children && n.children.length) flattenRegions(n.children, acc);
+    }
+    return acc;
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadRegions() {
+      try {
+        const regions = await apiFetch<RegionNode[]>(`/api/regions`);
+        if (mounted) {
+          setRegionNameMap(flattenRegions(regions));
+          setRootRegionIds(new Set(regions.map((r) => r.id)));
+        }
+      } catch {
+        // ignore mapping errors; fallback to codes
+      }
+    }
+    loadRegions();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const selectedRegionNames = useMemo(() => {
+    const filtered = selectedRegions.filter((id) => !rootRegionIds.has(id));
+    return filtered.map((id) => regionNameMap[id] ?? id);
+  }, [selectedRegions, regionNameMap, rootRegionIds]);
   const loadProjects = useCallback(
     async (page = pagination.current ?? 1, pageSize = pagination.pageSize ?? 20) => {
       setLoading(true);
@@ -85,6 +121,25 @@ export default function ResultsPage() {
     },
   ];
 
+  const handleDeleteFiltered = async () => {
+    if (selectedRegions.length === 0) {
+      message.warning('请选择需要删除的地区');
+      return;
+    }
+    setDeleting(true);
+    try {
+      const params = new URLSearchParams();
+      selectedRegions.forEach((region) => params.append('regions', region));
+      const res = await apiFetch<{ deleted: number }>(`/api/projects/by-regions?${params.toString()}`, {
+        method: 'DELETE',
+      });
+      message.success(`已删除 ${res.deleted} 条记录`);
+      await loadProjects(1, pagination.pageSize ?? 20);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const handleExport = () => {
     if (selectedRegions.length === 0) {
       message.warning('请选择至少一个地区再导出');
@@ -105,18 +160,35 @@ export default function ResultsPage() {
           <Col xs={24} md={12} lg={14}>
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
               <Typography.Paragraph>
-                选择需要查看的地区后，点击“筛选结果”以加载对应的命中项目列表，可导出为 CSV 用于进一步分析。
+                选择需要查看的地区后，点击“按地区筛选”以加载对应的命中项目列表，可使用“导出筛选结果”下载 CSV 用于进一步分析。
               </Typography.Paragraph>
               <Space>
                 <Button type="primary" icon={<FilterOutlined />} size="large" onClick={handleFilter}>
-                  筛选结果
+                  按地区筛选
                 </Button>
                 <Button icon={<DownloadOutlined />} size="large" onClick={handleExport}>
-                  导出CSV
+                  导出筛选结果
                 </Button>
+                <Popconfirm
+                  title="删除筛选结果"
+                  description={
+                    <div style={{ maxWidth: 420, whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                      确定删除当前筛选的所有结果（{selectedRegionNames.join('、') || '未选择'}）？此操作不可撤销。
+                    </div>
+                  }
+                  onConfirm={handleDeleteFiltered}
+                  okButtonProps={{ danger: true }}
+                  okText="删除"
+                  cancelText="取消"
+                  overlayStyle={{ width: 420 }}
+                >
+                  <Button danger icon={<DeleteOutlined />} size="large" disabled={selectedRegions.length === 0} loading={deleting}>
+                    删除筛选结果
+                  </Button>
+                </Popconfirm>
               </Space>
               <Typography.Text type="secondary">
-                当前所选地区：{selectedRegions.length === 0 ? '未选择' : selectedRegions.join('、')}
+                当前所选地区：{selectedRegionNames.length === 0 ? '未选择' : selectedRegionNames.join('、')}
               </Typography.Text>
             </Space>
           </Col>

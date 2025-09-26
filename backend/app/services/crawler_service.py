@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 class CrawlStats:
     total_items: int = 0
     valuable_projects: int = 0
+    matched_projects: int = 0  # 命中的符合条件项目（含重复）
 
 
 class CrawlerService:
@@ -83,7 +84,10 @@ class CrawlerService:
             crawl_run.valuable_projects = stats.valuable_projects
             crawl_run.finished_at = datetime.utcnow()
             session.commit()
-            append_log("INFO", f"任务 {run_id} 完成，累计事项 {stats.total_items}，命中项目 {stats.valuable_projects}")
+            append_log(
+                "INFO",
+                f"任务 {run_id} 完成：累计事项 {stats.total_items}，命中 {stats.matched_projects}，新入库 {stats.valuable_projects}"
+            )
         except Exception as exc:
             crawl_run.finished_at = datetime.utcnow()
             session.commit()
@@ -96,15 +100,33 @@ class CrawlerService:
         self, session: Session, region_code: str, stats: CrawlStats, *, should_stop: Optional[Callable[[], bool]] = None
     ) -> None:
         append_log("INFO", f"地区 {region_code} 历史爬取开始")
+        # 先探测总页数（接口 pageNo 支持从 0 开始）
         first_page = self.client.get_item_page(region_code, 0)
         total_pages = first_page.total_pages
         last_sendid = None
-        for page_no in range(total_pages, 0, -1):
+        # 倒序抓取：从最后一页索引(total_pages-1)到第 0 页
+        for page_no in range(total_pages - 1, -1, -1):
             if should_stop and should_stop():
                 append_log("INFO", f"地区 {region_code} 历史爬取中止")
                 break
             current_page = self.client.get_item_page(region_code, page_no)
+            before_total = stats.total_items
+            before_matched = stats.matched_projects
+            before_saved = stats.valuable_projects
             self._process_items(session, region_code, reversed(current_page.items), stats, should_stop=should_stop)
+            page_items = len(current_page.items)
+            delta_total = stats.total_items - before_total
+            delta_matched = stats.matched_projects - before_matched
+            delta_saved = stats.valuable_projects - before_saved
+            display_idx = page_no + 1
+            if page_items or total_pages:
+                append_log(
+                    "INFO",
+                    (
+                        f"地区 {region_code} 历史爬取 - 第 {display_idx}/{total_pages} 页，"
+                        f"事项 {page_items} 条，命中 {delta_matched} 个，新入库 {delta_saved} 个"
+                    ),
+                )
             if current_page.items:
                 last_sendid = current_page.items[0].sendid
         if last_sendid:
@@ -125,7 +147,17 @@ class CrawlerService:
         if not new_items:
             append_log("INFO", f"地区 {region_code} 无新增事项")
             return
+        before_matched = stats.matched_projects
+        before_saved = stats.valuable_projects
+        before_total = stats.total_items
         self._process_items(session, region_code, new_items, stats, should_stop=should_stop)
+        delta_total = stats.total_items - before_total
+        delta_matched = stats.matched_projects - before_matched
+        delta_saved = stats.valuable_projects - before_saved
+        append_log(
+            "INFO",
+            f"地区 {region_code} 增量处理完成：事项 {delta_total} 条，命中 {delta_matched} 个，新入库 {delta_saved} 个",
+        )
         latest = next(iter(new_items[::-1]), None)
         if latest:
             self._update_progress(session, region_code, latest.sendid)
@@ -133,7 +165,7 @@ class CrawlerService:
 
     def _collect_items_after_pivot(self, region_code: str, pivot: str) -> List[ItemSummary]:
         items: List[ItemSummary] = []
-        page_no = 1
+        page_no = 0
         found = False
         while True:
             page = self.client.get_item_page(region_code, page_no)
@@ -142,7 +174,8 @@ class CrawlerService:
                     found = True
                     break
                 items.append(entry)
-            if found or page_no >= page.total_pages:
+            # 总页数是数量，最后一页索引是 total_pages-1
+            if found or page_no >= (page.total_pages - 1):
                 break
             page_no += 1
         if not found:
@@ -163,9 +196,10 @@ class CrawlerService:
                 append_log("INFO", f"地区 {region_code} 项目处理被中止")
                 break
             stats.total_items += 1
-            append_log("DEBUG", f"处理事项 {item.sendid} 项目 {item.projectuuid}")
             project = session.get(ValuableProject, item.projectuuid)
             if project:
+                # 已在库中，视为再次命中，不再重复拉详情
+                stats.matched_projects += 1
                 self._update_progress(session, region_code, item.sendid)
                 continue
             detail = self.client.get_project_detail(item.projectuuid)
@@ -183,6 +217,7 @@ class CrawlerService:
                     )
                 )
                 stats.valuable_projects += 1
+                stats.matched_projects += 1
                 append_log("INFO", f"记录项目 {detail.projectuuid} - {detail.project_name}")
             self._update_progress(session, region_code, item.sendid)
 
