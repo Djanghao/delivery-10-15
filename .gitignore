@@ -1,6 +1,36 @@
+# Local backups
 backup/
+
+# Tooling configs
 .claude
-__pycache__
-node_modules/
+.DS_Store
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtualenv
+.venv/
 venv/
+
+# Node/Next
+node_modules/
 .next/
+frontend/.next/
+
+# Build/coverage (if any)
+dist/
+build/
+coverage/
+
+# App runtime data (DB, logs)
+data/
+backend/data/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Keep empty data folders if needed
+!data/.gitkeep
+!backend/data/.gitkeep
