@@ -56,3 +56,11 @@ def list_runs(db: Session = Depends(get_db)) -> List[CrawlRunItem]:
             )
         )
     return items
+
+
+@router.post("/stop/{task_id}")
+def stop_task(task_id: str) -> dict:
+    ok = task_manager.cancel(task_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    return {"task_id": task_id, "status": "cancelled"}

@@ -5,12 +5,11 @@ import { ThunderboltOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../components/RegionTree';
 import LogConsole, { LogEntry } from '../components/LogConsole';
-import RunHistoryList, { CrawlRunItem } from '../components/RunHistoryList';
 import { apiFetch } from '../lib/api';
 
 interface TaskStatus {
   task_id: string;
-  status: 'pending' | 'running' | 'succeeded' | 'failed';
+  status: 'pending' | 'running' | 'succeeded' | 'failed' | 'cancelled';
   message?: string | null;
 }
 
@@ -22,17 +21,11 @@ export default function CrawlDashboard() {
   const [mode, setMode] = useState<CrawlMode>('history');
   const [submitting, setSubmitting] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [runs, setRuns] = useState<CrawlRunItem[]>([]);
   const [statuses, setStatuses] = useState<TaskStatus[]>([]);
 
   const refreshLogs = useCallback(async () => {
     const data = await apiFetch<LogEntry[]>(`/api/logs?limit=300`);
     setLogs(data);
-  }, []);
-
-  const refreshRuns = useCallback(async () => {
-    const data = await apiFetch<CrawlRunItem[]>(`/api/crawl/runs`);
-    setRuns(data);
   }, []);
 
   const refreshStatuses = useCallback(async () => {
@@ -42,15 +35,13 @@ export default function CrawlDashboard() {
 
   useEffect(() => {
     refreshLogs();
-    refreshRuns();
     refreshStatuses();
     const timer = setInterval(() => {
       refreshLogs();
-      refreshRuns();
       refreshStatuses();
     }, 5000);
     return () => clearInterval(timer);
-  }, [refreshLogs, refreshRuns, refreshStatuses]);
+  }, [refreshLogs, refreshStatuses]);
 
   const activeTasks = useMemo(
     () => statuses.filter((item) => item.status === 'pending' || item.status === 'running'),
@@ -70,7 +61,6 @@ export default function CrawlDashboard() {
       });
       message.success('任务已进入队列');
       refreshStatuses();
-      refreshRuns();
     } catch (err) {
       message.error((err as Error).message);
     } finally {
@@ -133,7 +123,7 @@ export default function CrawlDashboard() {
 
       <LogConsole logs={logs} onRefresh={refreshLogs} onClear={handleClearLogs} />
 
-      <RunHistoryList runs={runs} />
+      {/* 最近任务列表已移除，改由“任务管理”页面展示 */}
     </Flex>
   );
 }

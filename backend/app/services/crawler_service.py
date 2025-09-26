@@ -5,7 +5,7 @@ import logging
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, Iterable, List, Optional
+from typing import Callable, Dict, Iterable, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -48,8 +48,16 @@ class CrawlerService:
             city_level.extend(root.children)
         return city_level
 
-    def run_task(self, session: Session, mode: str, region_codes: List[str]) -> CrawlRun:
-        run_id = str(uuid.uuid4())
+    def run_task(
+        self,
+        session: Session,
+        mode: str,
+        region_codes: List[str],
+        *,
+        run_id: Optional[str] = None,
+        should_stop: Optional[Callable[[], bool]] = None,
+    ) -> CrawlRun:
+        run_id = run_id or str(uuid.uuid4())
         crawl_run = CrawlRun(
             id=run_id,
             mode=mode,
@@ -64,10 +72,13 @@ class CrawlerService:
         stats = CrawlStats()
         try:
             for region_code in region_codes:
+                if should_stop and should_stop():
+                    append_log("INFO", f"任务 {run_id} 已请求终止，停止后续处理")
+                    break
                 if mode == "history":
-                    self._run_history_for_region(session, region_code, stats)
+                    self._run_history_for_region(session, region_code, stats, should_stop=should_stop)
                 else:
-                    self._run_incremental_for_region(session, region_code, stats)
+                    self._run_incremental_for_region(session, region_code, stats, should_stop=should_stop)
             crawl_run.total_items = stats.total_items
             crawl_run.valuable_projects = stats.valuable_projects
             crawl_run.finished_at = datetime.utcnow()
@@ -81,33 +92,40 @@ class CrawlerService:
             raise
         return crawl_run
 
-    def _run_history_for_region(self, session: Session, region_code: str, stats: CrawlStats) -> None:
+    def _run_history_for_region(
+        self, session: Session, region_code: str, stats: CrawlStats, *, should_stop: Optional[Callable[[], bool]] = None
+    ) -> None:
         append_log("INFO", f"地区 {region_code} 历史爬取开始")
         first_page = self.client.get_item_page(region_code, 0)
         total_pages = first_page.total_pages
         last_sendid = None
         for page_no in range(total_pages, 0, -1):
+            if should_stop and should_stop():
+                append_log("INFO", f"地区 {region_code} 历史爬取中止")
+                break
             current_page = self.client.get_item_page(region_code, page_no)
-            self._process_items(session, region_code, reversed(current_page.items), stats)
+            self._process_items(session, region_code, reversed(current_page.items), stats, should_stop=should_stop)
             if current_page.items:
                 last_sendid = current_page.items[0].sendid
         if last_sendid:
             self._update_progress(session, region_code, last_sendid)
         append_log("INFO", f"地区 {region_code} 历史爬取完成")
 
-    def _run_incremental_for_region(self, session: Session, region_code: str, stats: CrawlStats) -> None:
+    def _run_incremental_for_region(
+        self, session: Session, region_code: str, stats: CrawlStats, *, should_stop: Optional[Callable[[], bool]] = None
+    ) -> None:
         append_log("INFO", f"地区 {region_code} 增量爬取开始")
         progress = session.get(CrawlProgress, region_code)
         if not progress or not progress.last_pivot_sendid:
             append_log("INFO", f"地区 {region_code} 无历史 pivot，执行全量补齐")
-            self._run_history_for_region(session, region_code, stats)
+            self._run_history_for_region(session, region_code, stats, should_stop=should_stop)
             return
         pivot = progress.last_pivot_sendid
         new_items = self._collect_items_after_pivot(region_code, pivot)
         if not new_items:
             append_log("INFO", f"地区 {region_code} 无新增事项")
             return
-        self._process_items(session, region_code, new_items, stats)
+        self._process_items(session, region_code, new_items, stats, should_stop=should_stop)
         latest = next(iter(new_items[::-1]), None)
         if latest:
             self._update_progress(session, region_code, latest.sendid)
@@ -131,8 +149,19 @@ class CrawlerService:
             append_log("WARNING", f"地区 {region_code} 未找到 pivot {pivot}，返回所有事项")
         return list(reversed(items))
 
-    def _process_items(self, session: Session, region_code: str, items: Iterable[ItemSummary], stats: CrawlStats) -> None:
+    def _process_items(
+        self,
+        session: Session,
+        region_code: str,
+        items: Iterable[ItemSummary],
+        stats: CrawlStats,
+        *,
+        should_stop: Optional[Callable[[], bool]] = None,
+    ) -> None:
         for item in items:
+            if should_stop and should_stop():
+                append_log("INFO", f"地区 {region_code} 项目处理被中止")
+                break
             stats.total_items += 1
             append_log("DEBUG", f"处理事项 {item.sendid} 项目 {item.projectuuid}")
             project = session.get(ValuableProject, item.projectuuid)

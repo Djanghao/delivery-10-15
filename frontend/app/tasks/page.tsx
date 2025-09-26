@@ -1,0 +1,186 @@
+'use client';
+
+import { App, Badge, Button, Card, Empty, Flex, List, Segmented, Space, Tag, Typography } from 'antd';
+import { CheckCircleTwoTone, ClockCircleOutlined, PauseCircleTwoTone, StopOutlined } from '@ant-design/icons';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { apiFetch } from '../../lib/api';
+
+type TaskStatus = {
+  task_id: string;
+  status: 'pending' | 'running' | 'succeeded' | 'failed' | 'cancelled';
+  message?: string | null;
+  run_id?: string | null;
+  mode?: 'history' | 'incremental' | string;
+  regions?: string[];
+  started_at?: string | null;
+  finished_at?: string | null;
+};
+
+type CrawlRunItem = {
+  id: string;
+  mode: string;
+  regions: string[];
+  region_count: number;
+  total_items: number;
+  valuable_projects: number;
+  started_at: string;
+  finished_at?: string | null;
+};
+
+type ViewMode = 'open' | 'closed';
+
+function modeTag(mode?: string) {
+  if (mode === 'history') return <Tag color="blue">历史模式</Tag>;
+  if (mode === 'incremental') return <Tag color="cyan">增量模式</Tag>;
+  return null;
+}
+
+export default function TasksPage() {
+  const { message } = App.useApp();
+  const [view, setView] = useState<ViewMode>('open');
+  const [statuses, setStatuses] = useState<TaskStatus[]>([]);
+  const [runs, setRuns] = useState<CrawlRunItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [s, r] = await Promise.all([
+        apiFetch<TaskStatus[]>('/api/crawl/status'),
+        apiFetch<CrawlRunItem[]>('/api/crawl/runs'),
+      ]);
+      setStatuses(s);
+      setRuns(r);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    const timer = setInterval(refresh, 4000);
+    return () => clearInterval(timer);
+  }, [refresh]);
+
+  const openTasks = useMemo(
+    () => statuses.filter((t) => t.status === 'pending' || t.status === 'running'),
+    [statuses],
+  );
+  const closedRuns = useMemo(() => runs.filter((r) => !!r.finished_at), [runs]);
+
+  const runMap = useMemo(() => new Map(runs.map((r) => [r.id, r])), [runs]);
+
+  const handleStop = async (taskId: string) => {
+    try {
+      await apiFetch(`/api/crawl/stop/${taskId}`, { method: 'POST' });
+      message.success('已请求结束任务');
+      refresh();
+    } catch (err) {
+      message.error((err as Error).message);
+    }
+  };
+
+  return (
+    <Flex vertical gap={16}>
+      <Card style={{ padding: 16 }}>
+        <Segmented
+          value={view}
+          onChange={(val) => setView(val as ViewMode)}
+          options={[
+            { label: `进行中 (${openTasks.length})`, value: 'open' },
+            { label: `已结束 (${closedRuns.length})`, value: 'closed' },
+          ]}
+        />
+      </Card>
+
+      {view === 'open' ? (
+        <Card className="card" style={{ padding: 24 }} loading={loading}>
+          {openTasks.length === 0 ? (
+            <Empty description="暂无进行中的任务" />)
+          : (
+            <List
+              itemLayout="vertical"
+              dataSource={openTasks}
+              renderItem={(t) => {
+                const shortId = (t.run_id ?? t.task_id).slice(0, 8);
+                const run = t.run_id ? runMap.get(t.run_id) : undefined;
+                const start = t.started_at
+                  ? new Date(t.started_at).toLocaleString('zh-CN', { hour12: false })
+                  : '等待中';
+                const finish = t.finished_at
+                  ? new Date(t.finished_at).toLocaleString('zh-CN', { hour12: false })
+                  : '—';
+                return (
+                  <List.Item key={t.task_id} style={{ borderBlockEnd: '1px solid #f0f0f0' }}>
+                    <Space direction="vertical" size={6} style={{ width: '100%' }}>
+                      <Space align="center" size={8}>
+                        {t.status === 'running' ? (
+                          <PauseCircleTwoTone twoToneColor="#1DA1F2" />
+                        ) : (
+                          <ClockCircleOutlined style={{ color: '#657786' }} />
+                        )}
+                        <Typography.Text strong>任务编号：{shortId}</Typography.Text>
+                        {modeTag(t.mode)}
+                        <Badge count={`${t.regions?.length ?? run?.region_count ?? 0} 个地区`} style={{ backgroundColor: '#657786' }} />
+                      </Space>
+                      <Space size={12} wrap>
+                        <Typography.Text type="secondary">启动：{start}</Typography.Text>
+                        <Typography.Text type="secondary">结束：{finish}</Typography.Text>
+                        <Typography.Text>处理事项：{run?.total_items ?? 0}</Typography.Text>
+                        <Typography.Text>命中项目：{run?.valuable_projects ?? 0}</Typography.Text>
+                      </Space>
+                      <div>
+                        <Button danger icon={<StopOutlined />} onClick={() => handleStop(t.task_id)}>
+                          结束任务
+                        </Button>
+                      </div>
+                    </Space>
+                  </List.Item>
+                );
+              }}
+            />
+          )}
+        </Card>
+      ) : (
+        <Card className="card" style={{ padding: 24 }} loading={loading}>
+          {closedRuns.length === 0 ? (
+            <Empty description="暂无已结束的任务" />
+          ) : (
+            <List
+              itemLayout="vertical"
+              dataSource={closedRuns}
+              renderItem={(item) => {
+                const start = new Date(item.started_at).toLocaleString('zh-CN', { hour12: false });
+                const finish = item.finished_at
+                  ? new Date(item.finished_at).toLocaleString('zh-CN', { hour12: false })
+                  : '—';
+                return (
+                  <List.Item key={item.id} style={{ borderBlockEnd: '1px solid #f0f0f0' }}>
+                    <Space direction="vertical" size={6} style={{ width: '100%' }}>
+                      <Space align="center" size={8}>
+                        <CheckCircleTwoTone twoToneColor="#52c41a" />
+                        <Typography.Text strong>任务编号：{item.id.slice(0, 8)}</Typography.Text>
+                        {modeTag(item.mode)}
+                        <Badge count={`${item.region_count} 个地区`} style={{ backgroundColor: '#657786' }} />
+                      </Space>
+                      <Space size={12} wrap>
+                        <Typography.Text type="secondary">启动：{start}</Typography.Text>
+                        <Typography.Text type="secondary">结束：{finish}</Typography.Text>
+                        <Typography.Text>处理事项：{item.total_items}</Typography.Text>
+                        <Typography.Text>命中项目：{item.valuable_projects}</Typography.Text>
+                      </Space>
+                      <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                        覆盖地区：{item.regions.join(', ')}
+                      </Typography.Paragraph>
+                    </Space>
+                  </List.Item>
+                );
+              }}
+            />
+          )}
+        </Card>
+      )}
+    </Flex>
+  );
+}
+

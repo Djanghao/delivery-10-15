@@ -29,8 +29,14 @@ class CrawlStartResponse(BaseModel):
 
 class TaskStatus(BaseModel):
     task_id: str
-    status: Literal["pending", "running", "succeeded", "failed"]
+    status: Literal["pending", "running", "succeeded", "failed", "cancelled"]
     message: Optional[str] = None
+    # Optional enriched fields for frontend task view
+    run_id: Optional[str] = None
+    mode: Optional[str] = None
+    regions: Optional[List[str]] = None
+    started_at: Optional[datetime] = None
+    finished_at: Optional[datetime] = None
 
 
 class ProjectItem(BaseModel):
