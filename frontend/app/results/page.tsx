@@ -6,6 +6,7 @@ import { DeleteOutlined, DownloadOutlined, FilterOutlined } from '@ant-design/ic
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../../components/RegionTree';
 import { apiFetch, API_BASE } from '../../lib/api';
+import { useSharedRegions } from '../../lib/regionsStore';
 
 interface ProjectItem {
   projectuuid: string;
@@ -25,7 +26,7 @@ type Mode = 'history' | 'incremental';
 
 export default function ResultsPage() {
   const { message } = App.useApp();
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedRegions, setSelectedRegions] = useSharedRegions();
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({ current: 1, pageSize: 20, total: 0 });
   const [loading, setLoading] = useState(false);
@@ -56,8 +57,11 @@ export default function ResultsPage() {
       }
     }
     loadRegions();
+    const onRefreshed = () => loadRegions();
+    window.addEventListener('regions-refreshed', onRefreshed);
     return () => {
       mounted = false;
+      window.removeEventListener('regions-refreshed', onRefreshed);
     };
   }, []);
 

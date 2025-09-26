@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../components/RegionTree';
 import LogConsole, { LogEntry } from '../components/LogConsole';
 import { apiFetch } from '../lib/api';
+import { useSharedRegions } from '../lib/regionsStore';
 
 interface TaskStatus {
   task_id: string;
@@ -15,7 +16,7 @@ interface TaskStatus {
 
 export default function CrawlDashboard() {
   const { message } = App.useApp();
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedRegions, setSelectedRegions] = useSharedRegions();
   const [submitting, setSubmitting] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [statuses, setStatuses] = useState<TaskStatus[]>([]);

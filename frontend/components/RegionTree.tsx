@@ -1,6 +1,7 @@
 'use client';
 
-import { Tree, Typography, Spin } from 'antd';
+import { Tree, Typography, Spin, Button, Space, App } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import type { DataNode } from 'antd/es/tree';
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../lib/api';
@@ -25,8 +26,10 @@ function toTreeData(nodes: RegionNode[]): DataNode[] {
 }
 
 export default function RegionTree({ value, onChange }: Props) {
+  const { message } = App.useApp();
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -49,8 +52,30 @@ export default function RegionTree({ value, onChange }: Props) {
     };
   }, []);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const regions = await apiFetch<RegionNode[]>('/api/regions/refresh', { method: 'POST' });
+      setTreeData(toTreeData(regions));
+      message.success('地区列表已刷新');
+      try {
+        window.dispatchEvent(new Event('regions-refreshed'));
+      } catch {}
+    } catch (err) {
+      message.error((err as Error).message || '刷新失败');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <div>
+      <Space align="center" style={{ width: '100%', justifyContent: 'space-between' }}>
+        <Typography.Text strong>地区列表</Typography.Text>
+        <Button size="small" icon={<ReloadOutlined />} onClick={handleRefresh} loading={refreshing}>
+          刷新
+        </Button>
+      </Space>
       <div
         style={{
           maxHeight: 320,
