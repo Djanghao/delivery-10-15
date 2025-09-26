@@ -162,7 +162,7 @@ export default function ResultsPage() {
               <Typography.Paragraph>
                 选择需要查看的地区后，点击“按地区筛选”以加载对应的命中项目列表，可使用“导出筛选结果”下载 CSV 用于进一步分析。
               </Typography.Paragraph>
-              <Space>
+              <Space wrap size={[12, 12]} style={{ width: '100%' }}>
                 <Button type="primary" icon={<FilterOutlined />} size="large" onClick={handleFilter}>
                   按地区筛选
                 </Button>
