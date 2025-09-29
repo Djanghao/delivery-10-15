@@ -46,7 +46,7 @@ export default function TasksPage() {
     setLoading(true);
     try {
       const [s, r] = await Promise.all([
-        apiFetch<TaskStatus[]>('/api/crawl/status'),
+        apiFetch<TaskStatus[]>('/api/crawl/status?open_only=true'),
         apiFetch<CrawlRunItem[]>('/api/crawl/runs'),
       ]);
       setStatuses(s);
@@ -56,11 +56,22 @@ export default function TasksPage() {
     }
   }, []);
 
+  // 首次加载：拉一次数据
   useEffect(() => {
     refresh();
+  }, [refresh]);
+
+  // 仅在存在进行中/等待中的任务时轮询；无任务则不轮询
+  const hasOpenTasks = useMemo(
+    () => statuses.some((t) => t.status === 'pending' || t.status === 'running'),
+    [statuses],
+  );
+
+  useEffect(() => {
+    if (!hasOpenTasks) return;
     const timer = setInterval(refresh, 4000);
     return () => clearInterval(timer);
-  }, [refresh]);
+  }, [hasOpenTasks, refresh]);
 
   const openTasks = useMemo(
     () => statuses.filter((t) => t.status === 'pending' || t.status === 'running'),
@@ -183,4 +194,3 @@ export default function TasksPage() {
     </Flex>
   );
 }
-

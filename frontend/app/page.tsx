@@ -27,11 +27,24 @@ export default function CrawlDashboard() {
   }, []);
 
   const refreshStatuses = useCallback(async () => {
-    const data = await apiFetch<TaskStatus[]>(`/api/crawl/status`);
+    const data = await apiFetch<TaskStatus[]>(`/api/crawl/status?open_only=true`);
     setStatuses(data);
   }, []);
 
+  // 首次加载：只拉一次状态（无任务时不拉日志）
   useEffect(() => {
+    refreshStatuses();
+  }, [refreshLogs, refreshStatuses]);
+
+  // 仅在存在进行中/等待中的任务时轮询；无任务则不轮询
+  const hasOpenTasks = useMemo(
+    () => statuses.some((s) => s.status === 'pending' || s.status === 'running'),
+    [statuses],
+  );
+
+  useEffect(() => {
+    if (!hasOpenTasks) return;
+    // 进入活跃期：先立即拉一次，再开始轮询
     refreshLogs();
     refreshStatuses();
     const timer = setInterval(() => {
@@ -39,7 +52,7 @@ export default function CrawlDashboard() {
       refreshStatuses();
     }, 5000);
     return () => clearInterval(timer);
-  }, [refreshLogs, refreshStatuses]);
+  }, [hasOpenTasks, refreshLogs, refreshStatuses]);
 
   const pendingCount = useMemo(() => statuses.filter((s) => s.status === 'pending').length, [statuses]);
   const runningCount = useMemo(() => statuses.filter((s) => s.status === 'running').length, [statuses]);

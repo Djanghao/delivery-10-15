@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -33,8 +33,11 @@ def get_status(task_id: str) -> TaskStatus:
 
 
 @router.get("/status", response_model=List[TaskStatus])
-def list_status() -> List[TaskStatus]:
-    return task_manager.list_status()
+def list_status(open_only: bool = Query(True, description="仅返回进行中/等待中的任务")) -> List[TaskStatus]:
+    statuses = task_manager.list_status()
+    if open_only:
+        return [s for s in statuses if s.status in ("pending", "running")]
+    return statuses
 
 
 @router.get("/runs", response_model=List[CrawlRunItem])
