@@ -44,6 +44,7 @@ class ProjectItem(BaseModel):
     project_name: str
     region_code: str
     discovered_at: datetime
+    parsed_pdf: bool | None = None
 
 
 class PaginatedProjects(BaseModel):
@@ -76,3 +77,60 @@ class DeleteProjectsRequest(BaseModel):
 
 class DeleteByRegionsResponse(BaseModel):
     deleted: int
+
+
+# Detailed project info
+class ProjectFull(BaseModel):
+    projectuuid: str
+    project_name: str
+    region_code: str
+    discovered_at: datetime
+    parsed_pdf: bool
+    parsed_at: datetime | None = None
+    pdf_extract: dict | None = None
+    pdf_file_path: str | None = None
+
+
+# Parse endpoints
+class ParseDetailItem(BaseModel):
+    sendid: str
+    item_name: str
+    url: str | None = None
+
+
+class ParseDetailResponse(BaseModel):
+    projectuuid: str
+    project_name: str
+    items: List[ParseDetailItem]
+
+
+class ParseCaptchaStartRequest(BaseModel):
+    projectuuid: str
+    sendid: str
+
+
+class ParseCaptchaStartResponse(BaseModel):
+    parse_session_id: str
+    captcha_image_base64: str
+
+
+class ParseCaptchaVerifyRequest(BaseModel):
+    parse_session_id: str
+    code: str
+
+
+class ParseCaptchaVerifyResponse(BaseModel):
+    ok: bool
+    captcha_image_base64: str | None = None
+
+
+class ParseDownloadRequest(BaseModel):
+    parse_session_id: str
+    url: str
+    projectuuid: str
+
+
+class ParseDownloadResponse(BaseModel):
+    ok: bool
+    saved_path: str | None = None
+    parsed_fields: dict | None = None

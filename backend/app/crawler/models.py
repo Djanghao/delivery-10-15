@@ -48,10 +48,16 @@ class ItemSummary:
 class ProjectItem:
     sendid: str
     item_name: str
+    url: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> "ProjectItem":
-        return cls(sendid=str(data.get("sendid")), item_name=str(data.get("item_name")))
+        url = data.get("url")
+        return cls(
+            sendid=str(data.get("sendid")),
+            item_name=str(data.get("item_name")),
+            url=(str(url) if url else None),
+        )
 
     def matches_target(self) -> bool:
         return self.item_name in TARGET_ITEM_NAMES

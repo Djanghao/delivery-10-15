@@ -10,7 +10,13 @@ from sqlalchemy.orm import Session
 
 from ...db import get_db
 from ...models import ValuableProject
-from ...schemas import PaginatedProjects, ProjectItem, DeleteProjectsRequest, DeleteByRegionsResponse
+from ...schemas import (
+    PaginatedProjects,
+    ProjectItem,
+    DeleteProjectsRequest,
+    DeleteByRegionsResponse,
+    ProjectFull,
+)
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -39,6 +45,7 @@ def list_projects(
                 project_name=item.project_name,
                 region_code=item.region_code,
                 discovered_at=item.discovered_at,
+                parsed_pdf=item.parsed_pdf,
             )
             for item in items
         ],
@@ -92,3 +99,28 @@ def delete_by_regions(regions: List[str] = Query(default_factory=list), db: Sess
     db.commit()
     deleted = int(result.rowcount or 0)
     return DeleteByRegionsResponse(deleted=deleted)
+
+
+@router.get("/{projectuuid}", response_model=ProjectFull)
+def get_project_full(projectuuid: str, db: Session = Depends(get_db)) -> ProjectFull:
+    project = db.get(ValuableProject, projectuuid)
+    if not project:
+        raise HTTPException(status_code=404, detail="项目不存在")
+    pdf_extract = None
+    if project.pdf_extract_json:
+        import json as _json
+
+        try:
+            pdf_extract = _json.loads(project.pdf_extract_json)
+        except Exception:
+            pdf_extract = None
+    return ProjectFull(
+        projectuuid=project.projectuuid,
+        project_name=project.project_name,
+        region_code=project.region_code,
+        discovered_at=project.discovered_at,
+        parsed_pdf=bool(project.parsed_pdf),
+        parsed_at=project.parsed_at,
+        pdf_extract=pdf_extract,
+        pdf_file_path=project.pdf_file_path,
+    )

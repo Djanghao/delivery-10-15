@@ -1,6 +1,6 @@
 'use client';
 
-import { App, Button, Card, Col, Flex, Popconfirm, Row, Space, Table, Typography } from 'antd';
+import { App, Button, Card, Col, Descriptions, Flex, Modal, Popconfirm, Row, Space, Table, Tag, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { DeleteOutlined, DownloadOutlined, FilterOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -13,6 +13,7 @@ interface ProjectItem {
   project_name: string;
   region_code: string;
   discovered_at: string;
+  parsed_pdf?: boolean;
 }
 
 interface PaginatedProjects {
@@ -33,6 +34,9 @@ export default function ResultsPage() {
   const [deleting, setDeleting] = useState(false);
   const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
   const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailData, setDetailData] = useState<any | null>(null);
 
   type RegionNode = { id: string; name: string; children?: RegionNode[] };
   const flattenRegions = (nodes: RegionNode[], acc: Record<string, string> = {}): Record<string, string> => {
@@ -104,7 +108,12 @@ export default function ResultsPage() {
       title: '项目名称',
       dataIndex: 'project_name',
       key: 'project_name',
-      render: (text: string) => <Typography.Text strong>{text}</Typography.Text>,
+      render: (text: string, record) => (
+        <Space>
+          <Typography.Text strong>{text}</Typography.Text>
+          {record.parsed_pdf ? <Tag color="green">已解析PDF</Tag> : null}
+        </Space>
+      ),
     },
     {
       title: '项目编号',
@@ -122,6 +131,13 @@ export default function ResultsPage() {
       dataIndex: 'discovered_at',
       key: 'discovered_at',
       render: (value: string) => new Date(value).toLocaleString('zh-CN', { hour12: false }),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <Button size="small" onClick={() => openDetail(record.projectuuid)}>查看详情</Button>
+      ),
     },
   ];
 
@@ -153,6 +169,17 @@ export default function ResultsPage() {
     selectedRegions.forEach((region) => params.append('regions', region));
     window.open(`${API_BASE}/api/projects/export?${params.toString()}`, '_blank');
   };
+
+  async function openDetail(projectuuid: string) {
+    setDetailVisible(true);
+    setDetailLoading(true);
+    try {
+      const data = await apiFetch<any>(`/api/projects/${projectuuid}`);
+      setDetailData(data);
+    } finally {
+      setDetailLoading(false);
+    }
+  }
 
   return (
     <Flex vertical gap={24}>
@@ -217,6 +244,58 @@ export default function ResultsPage() {
       </Card>
 
       {/* 任务执行摘要已移除 */}
+
+      <Modal
+        title="项目详情"
+        open={detailVisible}
+        onCancel={() => setDetailVisible(false)}
+        onOk={() => setDetailVisible(false)}
+        okText="关闭"
+        cancelButtonProps={{ style: { display: 'none' } }}
+        width={820}
+      >
+        {detailLoading ? (
+          <Typography.Text>加载中...</Typography.Text>
+        ) : detailData ? (
+          <div style={{ maxHeight: 520, overflow: 'auto' }}>
+            <Descriptions column={1} bordered size="small" labelStyle={{ width: 180 }}>
+              <Descriptions.Item label="项目名称">{detailData.project_name}</Descriptions.Item>
+              <Descriptions.Item label="项目编号">
+                <Typography.Text code>{detailData.projectuuid}</Typography.Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="地区编码">{detailData.region_code}</Descriptions.Item>
+              <Descriptions.Item label="命中时间">
+                {new Date(detailData.discovered_at).toLocaleString('zh-CN', { hour12: false })}
+              </Descriptions.Item>
+              <Descriptions.Item label="PDF解析">
+                {detailData.parsed_pdf ? <Tag color="green">已解析PDF</Tag> : <Tag>未解析</Tag>}
+              </Descriptions.Item>
+              {detailData.parsed_at ? (
+                <Descriptions.Item label="解析时间">
+                  {new Date(detailData.parsed_at).toLocaleString('zh-CN', { hour12: false })}
+                </Descriptions.Item>
+              ) : null}
+              {detailData.pdf_file_path ? (
+                <Descriptions.Item label="文件路径">{detailData.pdf_file_path}</Descriptions.Item>
+              ) : null}
+            </Descriptions>
+            {detailData.pdf_extract ? (
+              <div style={{ marginTop: 16 }}>
+                <Typography.Title level={5}>提取信息</Typography.Title>
+                <Descriptions column={1} size="small" bordered>
+                  {Object.entries(detailData.pdf_extract).map(([k, v]) => (
+                    <Descriptions.Item key={k} label={k}>
+                      {String(v ?? '')}
+                    </Descriptions.Item>
+                  ))}
+                </Descriptions>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <Typography.Text type="secondary">暂无数据</Typography.Text>
+        )}
+      </Modal>
     </Flex>
   );
 }

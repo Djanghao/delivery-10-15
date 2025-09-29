@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Layout, Menu, Typography } from 'antd';
-import { DashboardOutlined, TableOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { DashboardOutlined, TableOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UnorderedListOutlined, FileSearchOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ReactNode, useState } from 'react';
@@ -11,7 +11,13 @@ const { Header, Sider, Content } = Layout;
 export default function SidebarLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const selectedKeys = [
-    pathname.startsWith('/results') ? '/results' : pathname.startsWith('/tasks') ? '/tasks' : '/',
+    pathname.startsWith('/results')
+      ? '/results'
+      : pathname.startsWith('/extract')
+      ? '/extract'
+      : pathname.startsWith('/tasks')
+      ? '/tasks'
+      : '/',
   ];
   const [collapsed, setCollapsed] = useState(false);
 
@@ -62,6 +68,11 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
               key: '/',
               icon: <DashboardOutlined />,
               label: <Link href="/">数据爬取</Link>,
+            },
+            {
+              key: '/extract',
+              icon: <FileSearchOutlined />,
+              label: <Link href="/extract">信息提取</Link>,
             },
             {
               key: '/results',
