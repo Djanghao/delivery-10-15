@@ -48,7 +48,7 @@
    ```
 3. 如需与后端联调，请在 `.env.local` 中配置：
    ```ini
-   NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:8010
    ```
 
 ### 功能速览
