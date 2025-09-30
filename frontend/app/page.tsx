@@ -87,10 +87,7 @@ export default function CrawlDashboard() {
       <Card className="card" style={{ padding: 24 }}>
         <Row gutter={32}>
           <Col xs={24} md={12} lg={10}>
-            <Space direction="vertical" size={12} style={{ width: '100%' }}>
-              <Typography.Title level={5} style={{ margin: 0 }}>地区选择</Typography.Title>
-              <RegionTree value={selectedRegions} onChange={setSelectedRegions} />
-            </Space>
+            <RegionTree value={selectedRegions} onChange={setSelectedRegions} />
           </Col>
           <Col xs={24} md={12} lg={14}>
             <Space direction="vertical" size={18} style={{ width: '100%' }}>

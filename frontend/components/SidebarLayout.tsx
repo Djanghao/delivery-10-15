@@ -124,7 +124,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
             </Typography.Title>
           </div>
         </Header>
-        <Content style={{ padding: '24px 32px', minHeight: 'calc(100vh - 80px)' }}>
+        <Content style={{ padding: '32px 48px', minHeight: 'calc(100vh - 80px)', background: '#f5f8fa' }}>
           <div className="page-container">{children}</div>
         </Content>
       </Layout>
