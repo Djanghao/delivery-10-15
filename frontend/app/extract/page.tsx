@@ -47,6 +47,7 @@ export default function ExtractPage() {
   const [captchaVisible, setCaptchaVisible] = useState(false);
   const [captchaImage, setCaptchaImage] = useState<string>('');
   const [captchaCode, setCaptchaCode] = useState('');
+  const [captchaSubmitting, setCaptchaSubmitting] = useState(false);
   const activeSessionRef = useRef<ParseSession | null>(null);
   const activeContextRef = useRef<{ project: ProjectItem; item: ParseDetailItem } | null>(null);
   const stopRequestedRef = useRef(false);
@@ -215,6 +216,7 @@ export default function ExtractPage() {
     const ctx = activeContextRef.current;
     if (!sess || !ctx) return;
     try {
+      setCaptchaSubmitting(true);
       const verify = await apiFetch<{ ok: boolean; captcha_image_base64?: string }>(`/api/parse/captcha/verify`, {
         method: 'POST',
         body: JSON.stringify({ parse_session_id: sess.parse_session_id, code: captchaCode }),
@@ -223,6 +225,7 @@ export default function ExtractPage() {
         setCaptchaImage(verify.captcha_image_base64 || '');
         setCaptchaCode('');
         message.error('验证码错误，请重试');
+        setCaptchaSubmitting(false);
         return;
       }
       // Verified → download & parse
@@ -234,6 +237,7 @@ export default function ExtractPage() {
           projectuuid: ctx.project.projectuuid,
         }),
       });
+      setCaptchaSubmitting(false);
       setCaptchaVisible(false);
       message.success(`已解析：${ctx.project.project_name}`);
       // Notify waiting promise to continue
@@ -241,6 +245,7 @@ export default function ExtractPage() {
       window.dispatchEvent(ev);
     } catch (err) {
       message.error((err as Error).message || '处理失败');
+      setCaptchaSubmitting(false);
       const ev = new CustomEvent('parse-step-finished', { detail: { success: false } });
       window.dispatchEvent(ev);
     }
@@ -303,8 +308,12 @@ export default function ExtractPage() {
           </Space>
         }
         open={captchaVisible}
-        onCancel={() => setCaptchaVisible(false)}
+        onCancel={() => {
+          setCaptchaVisible(false);
+          setCaptchaSubmitting(false);
+        }}
         onOk={submitCaptcha}
+        confirmLoading={captchaSubmitting}
         okText="提交"
         cancelText="取消"
       >
@@ -319,4 +328,3 @@ export default function ExtractPage() {
     </Flex>
   );
 }
-
