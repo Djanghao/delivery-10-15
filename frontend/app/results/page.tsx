@@ -190,7 +190,7 @@ export default function ResultsPage() {
           <Col xs={24} md={12} lg={14}>
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
               <Typography.Paragraph>
-                选择需要查看的地区后，点击“按地区筛选”以加载对应的命中项目列表，可使用“导出筛选结果”下载 CSV 用于进一步分析。
+                选择需要查看的地区后，点击“按地区筛选”以加载对应的项目列表，可使用“导出筛选结果”下载 CSV 用于进一步分析。
               </Typography.Paragraph>
               <Space wrap size={[12, 12]} style={{ width: '100%' }}>
                 <Button type="primary" icon={<FilterOutlined />} size="large" onClick={handleFilter}>
@@ -227,7 +227,7 @@ export default function ResultsPage() {
 
       <Card className="card" style={{ padding: 24 }}>
         <Typography.Title level={4} style={{ marginBottom: 16 }}>
-          命中项目列表
+          项目列表
         </Typography.Title>
         <Table<ProjectItem>
           columns={columns}
@@ -244,4 +244,3 @@ export default function ResultsPage() {
     </Flex>
   );
 }
-

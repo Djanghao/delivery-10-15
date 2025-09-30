@@ -77,7 +77,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
             {
               key: '/results',
               icon: <TableOutlined />,
-              label: <Link href="/results">爬取结果</Link>,
+              label: <Link href="/results">项目列表</Link>,
             },
             {
               key: '/tasks',
