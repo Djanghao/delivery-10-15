@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ...db import get_db
@@ -94,10 +95,11 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
     saved_path = save_to_project_dir(s.projectuuid, filename, content)
 
     extracted_fields = None
-    if filename.lower().endswith(".pdf"):
+    # If not download-only and file is a PDF, try to parse
+    if not payload.download_only and filename.lower().endswith(".pdf"):
         try:
             extracted_fields = extract_from_pdf(saved_path)
-        except Exception as exc:
+        except Exception:
             # PDF 无法解析则略过提取，仍返回保存路径
             extracted_fields = None
 
@@ -118,9 +120,37 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
         db.add(project)
         db.commit()
     else:
-        # 仅保存文件路径（如非PDF）
+        # 仅保存文件路径（download_only 或非PDF或解析失败）
         project.pdf_file_path = saved_path
         db.add(project)
         db.commit()
 
     return ParseDownloadResponse(ok=True, saved_path=saved_path, parsed_fields=extracted_fields)
+
+
+@router.post("/download-file")
+def download_file_to_client(payload: ParseDownloadRequest) -> Response:
+    """
+    Directly stream the file bytes to client for download.
+    Requires a verified captcha session.
+    This does not store the file on server nor parse it.
+    """
+    s = session_manager.get(payload.parse_session_id)
+    if not s:
+        raise HTTPException(status_code=404, detail="会话不存在或已过期")
+    if not s.verified_captcha_code:
+        raise HTTPException(status_code=400, detail="验证码未验证")
+
+    # Use sendid from payload if provided, otherwise session's sendid
+    sendid = payload.sendid or s.sendid
+    client = PublicAnnouncementClient()
+    content = download_with_session(client, s.cookies, s.referer, sendid, payload.flag, s.verified_captcha_code)
+
+    # Determine filename and media type
+    if payload.url:
+        filename = os.path.basename(payload.url)
+    else:
+        filename = f"{sendid}.pdf"
+    media_type = "application/pdf" if filename.lower().endswith(".pdf") else "application/octet-stream"
+    headers = {"Content-Disposition": f"attachment; filename={filename}"}
+    return Response(content=content, media_type=media_type, headers=headers)

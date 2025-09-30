@@ -130,6 +130,8 @@ class ParseDownloadRequest(BaseModel):
     flag: str = "1"
     projectuuid: str
     url: str | None = None
+    # If true, only download and save to disk; skip parsing
+    download_only: bool = False
 
 
 class ParseDownloadResponse(BaseModel):
