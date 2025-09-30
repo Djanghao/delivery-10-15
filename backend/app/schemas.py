@@ -126,8 +126,10 @@ class ParseCaptchaVerifyResponse(BaseModel):
 
 class ParseDownloadRequest(BaseModel):
     parse_session_id: str
-    url: str
+    sendid: str | None = None
+    flag: str = "1"
     projectuuid: str
+    url: str | None = None
 
 
 class ParseDownloadResponse(BaseModel):

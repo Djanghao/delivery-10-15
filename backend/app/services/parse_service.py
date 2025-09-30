@@ -32,6 +32,7 @@ class ParseSession:
     referer: str
     created_at: float
     updated_at: float
+    verified_captcha_code: Optional[str] = None
 
 
 class ParseSessionManager:
@@ -141,13 +142,12 @@ def verify_captcha(client: PublicAnnouncementClient, cookies: str, referer: str,
     return '"random_flag":"1"' in payload
 
 
-def download_with_session(client: PublicAnnouncementClient, cookies: str, referer: str, url_path: str) -> bytes:
-    full_url = url_path
-    if not full_url.startswith("http"):
-        full_url = BASE_HOST + url_path.lstrip("/")
+def download_with_session(client: PublicAnnouncementClient, cookies: str, referer: str, sendid: str, flag: str, captcha_code: str) -> bytes:
+    # Build the correct download URL according to the API specification
+    download_url = f"{BASE_HOST}publicannouncement.do?method=downFile&sendid={sendid}&flag={flag}&Txtidcode={captcha_code}"
     headers = dict(client.headers)
     headers.update({"Cookie": cookies, "Referer": referer})
-    req = Request(full_url, headers=headers, method="GET")
+    req = Request(download_url, headers=headers, method="GET")
     with urlopen(req, timeout=client.timeout) as resp:
         return resp.read()
 

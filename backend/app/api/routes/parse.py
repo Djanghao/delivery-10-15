@@ -63,6 +63,7 @@ def verify_captcha_code(payload: ParseCaptchaVerifyRequest) -> ParseCaptchaVerif
     client = PublicAnnouncementClient()
     ok = verify_captcha(client, s.cookies, s.referer, payload.code)
     if ok:
+        s.verified_captcha_code = payload.code
         return ParseCaptchaVerifyResponse(ok=True)
     # 失败则返回新验证码图片，便于前端刷新
     cookies, img_bytes = establish_session_and_get_captcha(client, s.projectuuid, s.sendid)
@@ -75,9 +76,21 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
     s = session_manager.get(payload.parse_session_id)
     if not s:
         raise HTTPException(status_code=404, detail="会话不存在或已过期")
+    if not s.verified_captcha_code:
+        raise HTTPException(status_code=400, detail="验证码未验证")
+
+    # Use sendid from payload if provided, otherwise use session's sendid
+    sendid = payload.sendid or s.sendid
+
     client = PublicAnnouncementClient()
-    content = download_with_session(client, s.cookies, s.referer, payload.url)
-    filename = os.path.basename(payload.url)
+    content = download_with_session(client, s.cookies, s.referer, sendid, payload.flag, s.verified_captcha_code)
+
+    # Extract filename from url if provided, otherwise use sendid
+    if payload.url:
+        filename = os.path.basename(payload.url)
+    else:
+        filename = f"{sendid}.pdf"
+
     saved_path = save_to_project_dir(s.projectuuid, filename, content)
 
     extracted_fields = None
