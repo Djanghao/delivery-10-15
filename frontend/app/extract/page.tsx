@@ -5,6 +5,7 @@ import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { FilterOutlined, PlayCircleOutlined, StopOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RegionTree from '../../components/RegionTree';
+import ProjectDetailModal from '../../components/ProjectDetailModal';
 import { apiFetch } from '../../lib/api';
 import { useSharedRegions } from '../../lib/regionsStore';
 
@@ -51,6 +52,10 @@ export default function ExtractPage() {
   const activeSessionRef = useRef<ParseSession | null>(null);
   const activeContextRef = useRef<{ project: ProjectItem; item: ParseDetailItem } | null>(null);
   const stopRequestedRef = useRef(false);
+
+  // Project detail modal state
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [selectedProjectUUID, setSelectedProjectUUID] = useState<string | null>(null);
 
   type RegionNode = { id: string; name: string; children?: RegionNode[] };
   const flattenRegions = (nodes: RegionNode[], acc: Record<string, string> = {}): Record<string, string> => {
@@ -143,6 +148,7 @@ export default function ExtractPage() {
       render: (_, record) => (
         <Space>
           <Button size="small" onClick={() => parseSingleProject(record)} icon={<PlayCircleOutlined />}>解析该项目</Button>
+          <Button size="small" onClick={() => { setSelectedProjectUUID(record.projectuuid); setDetailVisible(true); }}>查看详情</Button>
         </Space>
       ),
     },
@@ -325,6 +331,13 @@ export default function ExtractPage() {
           <Input placeholder="验证码" value={captchaCode} onChange={(e) => setCaptchaCode(e.target.value)} />
         </Space>
       </Modal>
+
+      <ProjectDetailModal
+        open={detailVisible}
+        onClose={() => setDetailVisible(false)}
+        projectuuid={selectedProjectUUID}
+        allowActions
+      />
     </Flex>
   );
 }
