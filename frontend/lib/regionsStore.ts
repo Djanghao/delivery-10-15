@@ -17,7 +17,9 @@ function readFromStorage(): string[] {
 }
 
 export function useSharedRegions(): [string[], (next: string[]) => void] {
-  const [regions, setRegions] = useState<string[]>(() => readFromStorage());
+  // 为避免 SSR 与客户端首帧不一致导致的水合报错，这里不要在初始 state 读取 localStorage。
+  // 统一以 [] 作为首帧，随后在 useEffect 中再从 storage 同步。
+  const [regions, setRegions] = useState<string[]>([]);
 
   useEffect(() => {
     // 初始化时尝试同步一次（处理其他页面刚刚写入的情况）
@@ -42,4 +44,3 @@ export function useSharedRegions(): [string[], (next: string[]) => void] {
 
   return [regions, update];
 }
-
