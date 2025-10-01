@@ -86,54 +86,57 @@ export default function CrawlDashboard() {
     <Flex vertical gap={24}>
       <Card className="card" style={{ padding: 24 }}>
         <Row gutter={32}>
-          <Col xs={24} md={12} lg={10}>
+          <Col xs={24} md={14} lg={12}>
             <RegionTree value={selectedRegions} onChange={setSelectedRegions} />
           </Col>
-          <Col xs={24} md={12} lg={14}>
+          <Col xs={24} md={10} lg={12}>
             <Space direction="vertical" size={18} style={{ width: '100%' }}>
-              <div>
-                <Typography.Title level={5} style={{ margin: 0 }}>任务控制</Typography.Title>
-                <Space style={{ marginTop: 12 }} wrap>
+              <Typography.Title level={5} style={{ margin: 0 }}>任务控制</Typography.Title>
+              <Row gutter={16}>
+                <Col span={12}>
                   <Button
                     type="primary"
                     icon={<HistoryOutlined />}
                     size="large"
                     onClick={() => handleStart('history')}
                     loading={submitting}
+                    block
                   >
                     历史爬取
                   </Button>
+                </Col>
+                <Col span={12}>
                   <Button
                     type="primary"
                     icon={<DeploymentUnitOutlined />}
                     size="large"
                     onClick={() => handleStart('incremental')}
                     loading={submitting}
+                    block
                   >
                     增量爬取
                   </Button>
-                </Space>
-              </div>
+                </Col>
+              </Row>
               <Row gutter={16}>
-                <Col span={12} sm={8}>
+                <Col span={12}>
                   <Card bordered={false} style={{ background: '#f7fbff' }}>
                     <Statistic title="进行中" value={runningCount} valueStyle={{ color: '#1677ff' }} />
                   </Card>
                 </Col>
-                <Col span={12} sm={8}>
+                <Col span={12}>
                   <Card bordered={false} style={{ background: '#fffaf5' }}>
                     <Statistic title="等待中" value={pendingCount} valueStyle={{ color: '#fa8c16' }} />
                   </Card>
                 </Col>
               </Row>
-              {null}
               <Alert
                 type="info"
                 showIcon
                 message="使用说明"
                 description={
                   <span>
-                    先在左侧选择目标地区（勾选城市会自动包含下属区县，可按需增删），然后点击上方“历史爬取”或“增量爬取”按钮启动任务。
+                    先在左侧选择目标地区（勾选城市会自动包含下属区县，可按需增删），然后点击上方"历史爬取"或"增量爬取"按钮启动任务。
                     历史爬取会补齐历史命中项目；增量爬取仅处理上次 pivot 之后的新增事项，快速捕捉最新变更。
                   </span>
                 }

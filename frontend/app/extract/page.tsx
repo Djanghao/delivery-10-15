@@ -143,13 +143,17 @@ export default function ExtractPage() {
       render: (val?: boolean) => (val ? <Tag color="green">已解析PDF</Tag> : <Tag>未解析</Tag>),
     },
     {
-      title: '操作',
-      key: 'action',
+      title: '解析',
+      key: 'parse',
       render: (_, record) => (
-        <Space>
-          <Button size="small" onClick={() => parseSingleProject(record)} icon={<PlayCircleOutlined />}>解析该项目</Button>
-          <Button size="small" onClick={() => { setSelectedProjectUUID(record.projectuuid); setDetailVisible(true); }}>查看详情</Button>
-        </Space>
+        <Button size="small" onClick={() => parseSingleProject(record)} icon={<PlayCircleOutlined />}>解析该项目</Button>
+      ),
+    },
+    {
+      title: '查看',
+      key: 'detail',
+      render: (_, record) => (
+        <Button size="small" onClick={() => { setSelectedProjectUUID(record.projectuuid); setDetailVisible(true); }}>查看详情</Button>
       ),
     },
   ];

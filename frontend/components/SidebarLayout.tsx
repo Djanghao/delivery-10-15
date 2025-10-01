@@ -34,6 +34,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
         style={{
           background: '#ffffff',
           borderRight: '1px solid #e6ecf0',
+          boxShadow: '2px 0 12px rgba(15, 20, 25, 0.03)',
           position: 'sticky',
           top: 0,
           height: '100vh',
@@ -45,7 +46,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
-            padding: '16px 12px',
+            padding: '16px 16px',
             minHeight: 64,
             position: 'sticky',
             top: 0,
@@ -93,6 +94,7 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
           style={{
             background: '#ffffff',
             borderBottom: '1px solid #e6ecf0',
+            boxShadow: '0 2px 12px rgba(15, 20, 25, 0.04)',
             padding: '0 24px',
             display: 'flex',
             alignItems: 'center',

@@ -110,12 +110,7 @@ export default function ResultsPage() {
       title: '项目名称',
       dataIndex: 'project_name',
       key: 'project_name',
-      render: (text: string, record) => (
-        <Space>
-          <Typography.Text strong>{text}</Typography.Text>
-          {record.parsed_pdf ? <Tag color="green">已解析PDF</Tag> : null}
-        </Space>
-      ),
+      render: (text: string) => <Typography.Text strong>{text}</Typography.Text>,
     },
     {
       title: '项目编号',
@@ -124,19 +119,22 @@ export default function ResultsPage() {
       render: (value: string) => <Typography.Text code>{value}</Typography.Text>,
     },
     {
-      title: '地区编码',
-      dataIndex: 'region_code',
-      key: 'region_code',
+      title: '状态',
+      key: 'status',
+      render: (_, record) => (
+        record.parsed_pdf ? <Tag color="green">已解析PDF</Tag> : <Tag>未解析</Tag>
+      ),
     },
     {
-      title: '命中时间',
-      dataIndex: 'discovered_at',
-      key: 'discovered_at',
-      render: (value: string) => new Date(value).toLocaleString('zh-CN', { hour12: false }),
+      title: '解析',
+      key: 'parse',
+      render: (_, record) => (
+        <Button size="small">解析该项目</Button>
+      ),
     },
     {
-      title: '操作',
-      key: 'action',
+      title: '查看',
+      key: 'detail',
       render: (_, record) => (
         <Button size="small" onClick={() => openDetail(record.projectuuid)}>查看详情</Button>
       ),

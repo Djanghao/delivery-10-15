@@ -92,8 +92,8 @@ export default function TasksPage() {
   };
 
   return (
-    <Flex vertical gap={16}>
-      <Card style={{ padding: 16 }}>
+    <Flex vertical gap={20}>
+      <Card className="card" style={{ padding: '20px 24px' }}>
         <Segmented
           value={view}
           onChange={(val) => setView(val as ViewMode)}
@@ -101,17 +101,23 @@ export default function TasksPage() {
             { label: `进行中 (${openTasks.length})`, value: 'open' },
             { label: `已结束 (${closedRuns.length})`, value: 'closed' },
           ]}
+          size="large"
+          style={{ fontWeight: 500 }}
         />
       </Card>
 
       {view === 'open' ? (
-        <Card className="card" style={{ padding: 24 }} loading={loading}>
+        <Card className="card" style={{ padding: '32px' }} loading={loading}>
           {openTasks.length === 0 ? (
-            <Empty description="暂无进行中的任务" />)
-          : (
+            <Empty
+              description={<span style={{ color: '#8c8c8c', fontSize: 15 }}>暂无进行中的任务</span>}
+              style={{ padding: '60px 0' }}
+            />
+          ) : (
             <List
               itemLayout="vertical"
               dataSource={openTasks}
+              split={false}
               renderItem={(t) => {
                 const shortId = (t.run_id ?? t.task_id).slice(0, 8);
                 const run = t.run_id ? runMap.get(t.run_id) : undefined;
@@ -122,26 +128,63 @@ export default function TasksPage() {
                   ? new Date(t.finished_at).toLocaleString('zh-CN', { hour12: false })
                   : '—';
                 return (
-                  <List.Item key={t.task_id} style={{ borderBlockEnd: '1px solid #f0f0f0' }}>
-                    <Space direction="vertical" size={6} style={{ width: '100%' }}>
-                      <Space align="center" size={8}>
+                  <List.Item
+                    key={t.task_id}
+                    style={{
+                      padding: '20px',
+                      marginBottom: 16,
+                      background: '#fafafa',
+                      borderRadius: 12,
+                      border: '1px solid #f0f0f0',
+                      transition: 'all 0.3s ease',
+                    }}
+                    className="task-list-item"
+                  >
+                    <Space direction="vertical" size={12} style={{ width: '100%' }}>
+                      <Flex align="center" gap={12} wrap="wrap">
                         {t.status === 'running' ? (
-                          <PauseCircleTwoTone twoToneColor="#1DA1F2" />
+                          <PauseCircleTwoTone twoToneColor="#1DA1F2" style={{ fontSize: 20 }} />
                         ) : (
-                          <ClockCircleOutlined style={{ color: '#657786' }} />
+                          <ClockCircleOutlined style={{ color: '#657786', fontSize: 20 }} />
                         )}
-                        <Typography.Text strong>任务编号：{shortId}</Typography.Text>
+                        <Typography.Text strong style={{ fontSize: 16 }}>
+                          任务编号：{shortId}
+                        </Typography.Text>
                         {modeTag(t.mode)}
-                        <Badge count={`${t.regions?.length ?? run?.region_count ?? 0} 个地区`} style={{ backgroundColor: '#657786' }} />
-                      </Space>
-                      <Space size={12} wrap>
-                        <Typography.Text type="secondary">启动：{start}</Typography.Text>
-                        <Typography.Text type="secondary">结束：{finish}</Typography.Text>
-                        <Typography.Text>处理事项：{run?.total_items ?? 0}</Typography.Text>
-                        <Typography.Text>命中项目：{run?.valuable_projects ?? 0}</Typography.Text>
-                      </Space>
+                        <Badge
+                          count={`${t.regions?.length ?? run?.region_count ?? 0} 个地区`}
+                          style={{ backgroundColor: '#52c41a' }}
+                        />
+                      </Flex>
+                      <Flex gap={20} wrap="wrap" style={{ fontSize: 14 }}>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">启动：</Typography.Text>
+                          <Typography.Text>{start}</Typography.Text>
+                        </Space>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">结束：</Typography.Text>
+                          <Typography.Text>{finish}</Typography.Text>
+                        </Space>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">处理事项：</Typography.Text>
+                          <Typography.Text strong style={{ color: '#1DA1F2' }}>
+                            {run?.total_items ?? 0}
+                          </Typography.Text>
+                        </Space>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">命中项目：</Typography.Text>
+                          <Typography.Text strong style={{ color: '#52c41a' }}>
+                            {run?.valuable_projects ?? 0}
+                          </Typography.Text>
+                        </Space>
+                      </Flex>
                       <div>
-                        <Button danger icon={<StopOutlined />} onClick={() => handleStop(t.task_id)}>
+                        <Button
+                          danger
+                          icon={<StopOutlined />}
+                          onClick={() => handleStop(t.task_id)}
+                          size="middle"
+                        >
                           结束任务
                         </Button>
                       </div>
@@ -153,35 +196,81 @@ export default function TasksPage() {
           )}
         </Card>
       ) : (
-        <Card className="card" style={{ padding: 24 }} loading={loading}>
+        <Card className="card" style={{ padding: '32px' }} loading={loading}>
           {closedRuns.length === 0 ? (
-            <Empty description="暂无已结束的任务" />
+            <Empty
+              description={<span style={{ color: '#8c8c8c', fontSize: 15 }}>暂无已结束的任务</span>}
+              style={{ padding: '60px 0' }}
+            />
           ) : (
             <List
               itemLayout="vertical"
               dataSource={closedRuns}
+              split={false}
               renderItem={(item) => {
                 const start = new Date(item.started_at).toLocaleString('zh-CN', { hour12: false });
                 const finish = item.finished_at
                   ? new Date(item.finished_at).toLocaleString('zh-CN', { hour12: false })
                   : '—';
                 return (
-                  <List.Item key={item.id} style={{ borderBlockEnd: '1px solid #f0f0f0' }}>
-                    <Space direction="vertical" size={6} style={{ width: '100%' }}>
-                      <Space align="center" size={8}>
-                        <CheckCircleTwoTone twoToneColor="#52c41a" />
-                        <Typography.Text strong>任务编号：{item.id.slice(0, 8)}</Typography.Text>
+                  <List.Item
+                    key={item.id}
+                    style={{
+                      padding: '20px',
+                      marginBottom: 16,
+                      background: '#fafafa',
+                      borderRadius: 12,
+                      border: '1px solid #f0f0f0',
+                      transition: 'all 0.3s ease',
+                    }}
+                    className="task-list-item"
+                  >
+                    <Space direction="vertical" size={12} style={{ width: '100%' }}>
+                      <Flex align="center" gap={12} wrap="wrap">
+                        <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: 20 }} />
+                        <Typography.Text strong style={{ fontSize: 16 }}>
+                          任务编号：{item.id.slice(0, 8)}
+                        </Typography.Text>
                         {modeTag(item.mode)}
-                        <Badge count={`${item.region_count} 个地区`} style={{ backgroundColor: '#657786' }} />
-                      </Space>
-                      <Space size={12} wrap>
-                        <Typography.Text type="secondary">启动：{start}</Typography.Text>
-                        <Typography.Text type="secondary">结束：{finish}</Typography.Text>
-                        <Typography.Text>处理事项：{item.total_items}</Typography.Text>
-                        <Typography.Text>命中项目：{item.valuable_projects}</Typography.Text>
-                      </Space>
-                      <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                        覆盖地区：{item.regions.join(', ')}
+                        <Badge
+                          count={`${item.region_count} 个地区`}
+                          style={{ backgroundColor: '#52c41a' }}
+                        />
+                      </Flex>
+                      <Flex gap={20} wrap="wrap" style={{ fontSize: 14 }}>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">启动：</Typography.Text>
+                          <Typography.Text>{start}</Typography.Text>
+                        </Space>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">结束：</Typography.Text>
+                          <Typography.Text>{finish}</Typography.Text>
+                        </Space>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">处理事项：</Typography.Text>
+                          <Typography.Text strong style={{ color: '#1DA1F2' }}>
+                            {item.total_items}
+                          </Typography.Text>
+                        </Space>
+                        <Space size={6}>
+                          <Typography.Text type="secondary">命中项目：</Typography.Text>
+                          <Typography.Text strong style={{ color: '#52c41a' }}>
+                            {item.valuable_projects}
+                          </Typography.Text>
+                        </Space>
+                      </Flex>
+                      <Typography.Paragraph
+                        type="secondary"
+                        style={{
+                          marginBottom: 0,
+                          fontSize: 13,
+                          padding: '8px 12px',
+                          background: 'white',
+                          borderRadius: 8,
+                        }}
+                      >
+                        <span style={{ fontWeight: 500 }}>覆盖地区：</span>
+                        {item.regions.join(', ')}
                       </Typography.Paragraph>
                     </Space>
                   </List.Item>

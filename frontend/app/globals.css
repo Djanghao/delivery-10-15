@@ -1,13 +1,13 @@
 :root {
+  /* Base */
   color-scheme: light;
-  font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background-color: #f5f8fa;
-}
-
-:root {
-  color-scheme: light;
-  font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background-color: #f5f8fa;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --bg-layout: #f5f8fa;
+  --bg-card: #ffffff;
+  --text-primary: #15202b;
+  --text-secondary: #667085;
+  --border-color: #e6ecf0;
+  --primary: #1DA1F2;
 }
 
 /* Ant Design baseline reset early to avoid FOUC */
@@ -16,13 +16,20 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #f5f8fa;
-  color: #15202b;
+  background-color: var(--bg-layout);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary);
 }
 
 .app-shell {
@@ -33,12 +40,18 @@ a {
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  padding: 0 24px;
 }
 
 .card {
-  background: #ffffff;
+  background: var(--bg-card);
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(15, 20, 25, 0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 10px 28px rgba(15, 20, 25, 0.12);
 }
 
 .dark-console {
@@ -53,4 +66,30 @@ a {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Subtle scrollbars */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Focus ring for accessibility */
+:focus-visible {
+  outline: 2px solid rgba(29, 161, 242, 0.6);
+  outline-offset: 2px;
+}
+
+/* Task list item hover effect */
+.task-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border-color: #d9d9d9 !important;
 }
