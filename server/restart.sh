@@ -1,13 +1,15 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(dirname "$0")"
+
 echo "Restarting Gov Stats Crawler..."
 echo ""
 
-./stop.sh
+"$SCRIPT_DIR/stop.sh"
 
 echo ""
 echo "Waiting 2 seconds..."
 sleep 2
 echo ""
 
-./start.sh
+"$SCRIPT_DIR/start.sh"

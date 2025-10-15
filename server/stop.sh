@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")/.."
+
 echo "Stopping Gov Stats Crawler..."
 echo ""
 
