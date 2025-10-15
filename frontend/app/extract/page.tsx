@@ -1,8 +1,8 @@
 'use client';
 
-import { App, Badge, Button, Card, Col, Flex, Image, Input, Modal, Row, Space, Table, Tag, Typography } from 'antd';
+import { App, Badge, Button, Card, Col, Flex, Image, Input, Modal, Row, Space, Spin, Table, Tag, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { FilterOutlined, PlayCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { FilterOutlined, PlayCircleOutlined, StopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RegionTree from '../../components/RegionTree';
 import ProjectDetailModal from '../../components/ProjectDetailModal';
@@ -44,14 +44,17 @@ export default function ExtractPage() {
   const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
   const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
 
-  // Captcha modal state
   const [captchaVisible, setCaptchaVisible] = useState(false);
   const [captchaImage, setCaptchaImage] = useState<string>('');
   const [captchaCode, setCaptchaCode] = useState('');
   const [captchaSubmitting, setCaptchaSubmitting] = useState(false);
+  const [captchaLoading, setCaptchaLoading] = useState(false);
+  const [currentProjectName, setCurrentProjectName] = useState<string>('');
+  const [currentItemName, setCurrentItemName] = useState<string>('');
   const activeSessionRef = useRef<ParseSession | null>(null);
   const activeContextRef = useRef<{ project: ProjectItem; item: ParseDetailItem } | null>(null);
   const stopRequestedRef = useRef(false);
+  const captchaInputRef = useRef<any>(null);
 
   // Project detail modal state
   const [detailVisible, setDetailVisible] = useState(false);
@@ -159,15 +162,27 @@ export default function ExtractPage() {
   ];
 
   async function openCaptcha(project: ProjectItem, item: ParseDetailItem) {
-    const res = await apiFetch<ParseSession>(`/api/parse/captcha/start`, {
-      method: 'POST',
-      body: JSON.stringify({ projectuuid: project.projectuuid, sendid: item.sendid }),
-    });
-    activeSessionRef.current = res;
-    activeContextRef.current = { project, item };
-    setCaptchaImage(res.captcha_image_base64);
-    setCaptchaCode('');
     setCaptchaVisible(true);
+    setCaptchaLoading(true);
+    setCurrentProjectName(project.project_name);
+    setCurrentItemName(item.item_name);
+    setCaptchaCode('');
+    setCaptchaImage('');
+
+    try {
+      const res = await apiFetch<ParseSession>(`/api/parse/captcha/start`, {
+        method: 'POST',
+        body: JSON.stringify({ projectuuid: project.projectuuid, sendid: item.sendid }),
+      });
+      activeSessionRef.current = res;
+      activeContextRef.current = { project, item };
+      setCaptchaImage(res.captcha_image_base64);
+    } finally {
+      setCaptchaLoading(false);
+      setTimeout(() => {
+        captchaInputRef.current?.focus();
+      }, 100);
+    }
   }
 
   async function parseSingleProject(project: ProjectItem) {
@@ -184,10 +199,9 @@ export default function ExtractPage() {
         ].includes(it.item_name),
       );
       for (const it of targets) {
-        if (!it.url) continue; // 非文件项跳过
+        if (!it.url) continue;
         if (stopRequestedRef.current) break;
         await openCaptcha(project, it);
-        // Wait for modal workflow to complete
         await new Promise<void>((resolve, reject) => {
           const handler = (e: CustomEvent<{ success: boolean }>) => {
             window.removeEventListener('parse-step-finished', handler as EventListener);
@@ -197,7 +211,6 @@ export default function ExtractPage() {
           window.addEventListener('parse-step-finished', handler as EventListener);
         });
       }
-      // Refresh project list to reflect parsed flag
       await loadProjects(pagination.current ?? 1, pagination.pageSize ?? 20);
     } catch (err) {
       message.error((err as Error).message || '解析失败');
@@ -210,15 +223,23 @@ export default function ExtractPage() {
       return;
     }
     stopRequestedRef.current = false;
-    for (const p of projects) {
-      if (stopRequestedRef.current) break;
-      await parseSingleProject(p);
+    try {
+      for (const p of projects) {
+        if (stopRequestedRef.current) break;
+        await parseSingleProject(p);
+      }
+    } finally {
+      setCaptchaVisible(false);
     }
   }
 
   function handleStopBatch() {
     stopRequestedRef.current = true;
     setCaptchaVisible(false);
+    setCaptchaLoading(false);
+    setCaptchaSubmitting(false);
+    const ev = new CustomEvent('parse-step-finished', { detail: { success: false } });
+    window.dispatchEvent(ev);
   }
 
   async function submitCaptcha() {
@@ -227,6 +248,7 @@ export default function ExtractPage() {
     if (!sess || !ctx) return;
     try {
       setCaptchaSubmitting(true);
+      setCaptchaLoading(true);
       const verify = await apiFetch<{ ok: boolean; captcha_image_base64?: string }>(`/api/parse/captcha/verify`, {
         method: 'POST',
         body: JSON.stringify({ parse_session_id: sess.parse_session_id, code: captchaCode }),
@@ -236,9 +258,12 @@ export default function ExtractPage() {
         setCaptchaCode('');
         message.error('验证码错误，请重试');
         setCaptchaSubmitting(false);
+        setCaptchaLoading(false);
+        setTimeout(() => {
+          captchaInputRef.current?.focus();
+        }, 100);
         return;
       }
-      // Verified → download & parse
       await apiFetch(`/api/parse/download`, {
         method: 'POST',
         body: JSON.stringify({
@@ -248,14 +273,18 @@ export default function ExtractPage() {
         }),
       });
       setCaptchaSubmitting(false);
-      setCaptchaVisible(false);
+      setCaptchaLoading(false);
+      setCaptchaCode('');
       message.success(`已解析：${ctx.project.project_name}`);
-      // Notify waiting promise to continue
       const ev = new CustomEvent('parse-step-finished', { detail: { success: true } });
       window.dispatchEvent(ev);
+      setTimeout(() => {
+        captchaInputRef.current?.focus();
+      }, 100);
     } catch (err) {
       message.error((err as Error).message || '处理失败');
       setCaptchaSubmitting(false);
+      setCaptchaLoading(false);
       const ev = new CustomEvent('parse-step-finished', { detail: { success: false } });
       window.dispatchEvent(ev);
     }
@@ -280,9 +309,6 @@ export default function ExtractPage() {
                 </Button>
                 <Button icon={<PlayCircleOutlined />} size="large" onClick={handleStartBatch} disabled={projects.length === 0}>
                   开始解析 PDF
-                </Button>
-                <Button danger icon={<StopOutlined />} size="large" onClick={handleStopBatch}>
-                  停止
                 </Button>
                 <Typography.Text type="secondary">
                   当前所选地区：{selectedRegionNames.length === 0 ? '未选择' : selectedRegionNames.join('、')}
@@ -310,26 +336,78 @@ export default function ExtractPage() {
       <Modal
         title={
           <Space>
-            <Badge color="#1677ff" />
-            <span>输入验证码</span>
+            <Badge status="processing" />
+            <span>PDF 解析进行中</span>
           </Space>
         }
         open={captchaVisible}
-        onCancel={() => {
-          setCaptchaVisible(false);
-          setCaptchaSubmitting(false);
-        }}
-        onOk={submitCaptcha}
-        confirmLoading={captchaSubmitting}
-        okText="提交"
-        cancelText="取消"
+        onCancel={handleStopBatch}
+        footer={[
+          <Button key="stop" danger icon={<StopOutlined />} onClick={handleStopBatch}>
+            停止解析
+          </Button>,
+          <Button key="submit" type="primary" loading={captchaSubmitting} onClick={submitCaptcha} disabled={!captchaCode.trim() || captchaLoading}>
+            提交验证码
+          </Button>,
+        ]}
+        width={560}
+        maskClosable={false}
       >
-        <Space direction="vertical" style={{ width: '100%' }} size={12}>
-          <Typography.Text>请输入验证码以继续下载并解析当前项目文件。</Typography.Text>
-          {captchaImage ? (
-            <Image src={captchaImage} alt="验证码" width={140} height={70} style={{ objectFit: 'contain' }} />
-          ) : null}
-          <Input placeholder="验证码" value={captchaCode} onChange={(e) => setCaptchaCode(e.target.value)} />
+        <Space direction="vertical" style={{ width: '100%' }} size={16}>
+          <Card size="small" style={{ background: '#f5f5f5' }}>
+            <Space direction="vertical" size={4} style={{ width: '100%' }}>
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                正在解析项目
+              </Typography.Text>
+              <Typography.Text strong style={{ fontSize: 14 }}>
+                {currentProjectName}
+              </Typography.Text>
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                文件类型：{currentItemName}
+              </Typography.Text>
+            </Space>
+          </Card>
+
+          <div>
+            <Typography.Text strong style={{ marginBottom: 8, display: 'block' }}>
+              验证码
+            </Typography.Text>
+            <div
+              style={{
+                width: '100%',
+                height: 300,
+                border: '1px solid #d9d9d9',
+                borderRadius: 6,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#fafafa',
+                padding: 16,
+              }}
+            >
+              {captchaLoading ? (
+                <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+              ) : captchaImage ? (
+                <img src={captchaImage} alt="验证码" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              ) : (
+                <Typography.Text type="secondary">等待验证码...</Typography.Text>
+              )}
+            </div>
+          </div>
+
+          <Input
+            ref={captchaInputRef}
+            placeholder="请输入验证码"
+            value={captchaCode}
+            onChange={(e) => setCaptchaCode(e.target.value)}
+            onPressEnter={submitCaptcha}
+            size="large"
+            disabled={captchaLoading}
+          />
+
+          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+            输入验证码后点击"提交验证码"继续，或点击"停止解析"结束当前批量解析任务。
+          </Typography.Text>
         </Space>
       </Modal>
 
