@@ -89,7 +89,7 @@ export default function ExtractPage() {
       mounted = false;
       window.removeEventListener('regions-refreshed', onRefreshed);
     };
-  }, []);
+  }, [flattenRegions]);
 
   const selectedRegionNames = useMemo(() => {
     const filtered = selectedRegions.filter((id) => !rootRegionIds.has(id));
@@ -111,7 +111,7 @@ export default function ExtractPage() {
         setLoading(false);
       }
     },
-    [pagination.current, pagination.pageSize, selectedRegions],
+    [selectedRegions],
   );
 
   const handleFilter = async () => {
@@ -406,7 +406,7 @@ export default function ExtractPage() {
           />
 
           <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-            输入验证码后点击"提交验证码"继续，或点击"停止解析"结束当前批量解析任务。
+            输入验证码后点击&ldquo;提交验证码&rdquo;继续，或点击&ldquo;停止解析&rdquo;结束当前批量解析任务。
           </Typography.Text>
         </Space>
       </Modal>
