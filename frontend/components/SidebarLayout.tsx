@@ -24,17 +24,17 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
   return (
     <Layout className="app-shell">
       <Sider
-        width={220}
+        width={200}
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        collapsedWidth={64}
+        collapsedWidth={60}
         breakpoint="lg"
         trigger={null}
         style={{
           background: '#ffffff',
           borderRight: '1px solid #e6ecf0',
-          boxShadow: '2px 0 12px rgba(15, 20, 25, 0.03)',
+          boxShadow: '2px 0 8px rgba(15, 20, 25, 0.02)',
           position: 'sticky',
           top: 0,
           height: '100vh',
@@ -46,8 +46,8 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            padding: '16px',
-            minHeight: 64,
+            padding: '12px',
+            minHeight: 56,
             position: 'sticky',
             top: 0,
             zIndex: 1,
@@ -94,39 +94,20 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
           style={{
             background: '#ffffff',
             borderBottom: '1px solid #e6ecf0',
-            boxShadow: '0 2px 12px rgba(15, 20, 25, 0.04)',
-            padding: '0 24px',
+            boxShadow: '0 1px 8px rgba(15, 20, 25, 0.03)',
+            padding: '0 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            gap: 16,
-            height: 80,
+            gap: 12,
+            height: 56,
           }}
         >
-          <a
-            href="https://tzxm.zjzwfw.gov.cn/tzxmweb/zwtpages/resultsPublicity/notice_of_publicity_new.html"
-            target="_blank"
-            rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center' }}
-            aria-label="浙江政务服务网"
-            title="浙江政务服务网"
-          >
-            <img
-              src="https://zjjcmspublic.oss-cn-hangzhou-zwynet-d01-a.internet.cloud.zj.gov.cn/jcms_files/jcms1/web1/site/script/zjservice/resources/index1/newImg/zjzwLogo.png"
-              alt="浙江政务服务网"
-              style={{ height: 44, width: 'auto', borderRadius: 10, display: 'block', objectFit: 'contain' }}
-            />
-          </a>
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-            <Typography.Title level={4} style={{ margin: 0, color: '#374151', fontWeight: 700 }}>
-              投资项目在线审批监管平台
-            </Typography.Title>
-            <Typography.Title level={4} style={{ margin: 0, color: '#374151', fontWeight: 700 }}>
-              工程建设项目审批爬取系统
-            </Typography.Title>
-          </div>
+          <Typography.Title level={5} style={{ margin: 0, color: '#374151', fontWeight: 600, fontSize: 15 }}>
+            投资项目在线审批监管平台 - 工程建设项目审批爬取系统
+          </Typography.Title>
         </Header>
-        <Content style={{ padding: '32px 48px', minHeight: 'calc(100vh - 80px)', background: '#f5f8fa' }}>
+        <Content style={{ padding: '20px 32px', minHeight: 'calc(100vh - 56px)', background: '#f5f8fa' }}>
           <div className="page-container">{children}</div>
         </Content>
       </Layout>

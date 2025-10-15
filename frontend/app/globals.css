@@ -19,6 +19,7 @@ body {
   background-color: var(--bg-layout);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  font-size: 13px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -40,13 +41,13 @@ a:hover {
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
-  padding: 0 24px;
+  padding: 0 16px;
 }
 
 .card {
   background: var(--bg-card);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(15, 20, 25, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15, 20, 25, 0.06);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
@@ -57,9 +58,10 @@ a:hover {
 .dark-console {
   background: #0f1419;
   color: #e6ecf0;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 8px;
+  padding: 12px;
   font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
 }
 
 .dark-console .log-message {

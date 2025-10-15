@@ -92,8 +92,8 @@ export default function TasksPage() {
   };
 
   return (
-    <Flex vertical gap={20}>
-      <Card className="card" style={{ padding: '20px 24px' }}>
+    <Flex vertical gap={16}>
+      <Card className="card" style={{ padding: '16px 20px' }}>
         <Segmented
           value={view}
           onChange={(val) => setView(val as ViewMode)}
@@ -101,17 +101,17 @@ export default function TasksPage() {
             { label: `进行中 (${openTasks.length})`, value: 'open' },
             { label: `已结束 (${closedRuns.length})`, value: 'closed' },
           ]}
-          size="large"
+          size="middle"
           style={{ fontWeight: 500 }}
         />
       </Card>
 
       {view === 'open' ? (
-        <Card className="card" style={{ padding: '32px' }} loading={loading}>
+        <Card className="card" style={{ padding: '20px' }} loading={loading}>
           {openTasks.length === 0 ? (
             <Empty
-              description={<span style={{ color: '#8c8c8c', fontSize: 15 }}>暂无进行中的任务</span>}
-              style={{ padding: '60px 0' }}
+              description={<span style={{ color: '#8c8c8c', fontSize: 13 }}>暂无进行中的任务</span>}
+              style={{ padding: '40px 0' }}
             />
           ) : (
             <List
@@ -131,32 +131,32 @@ export default function TasksPage() {
                   <List.Item
                     key={t.task_id}
                     style={{
-                      padding: '20px',
-                      marginBottom: 16,
+                      padding: '14px',
+                      marginBottom: 12,
                       background: '#fafafa',
-                      borderRadius: 12,
+                      borderRadius: 8,
                       border: '1px solid #f0f0f0',
                       transition: 'all 0.3s ease',
                     }}
                     className="task-list-item"
                   >
-                    <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                      <Flex align="center" gap={12} wrap="wrap">
+                    <Space direction="vertical" size={10} style={{ width: '100%' }}>
+                      <Flex align="center" gap={10} wrap="wrap">
                         {t.status === 'running' ? (
-                          <PauseCircleTwoTone twoToneColor="#1DA1F2" style={{ fontSize: 20 }} />
+                          <PauseCircleTwoTone twoToneColor="#1DA1F2" style={{ fontSize: 18 }} />
                         ) : (
-                          <ClockCircleOutlined style={{ color: '#657786', fontSize: 20 }} />
+                          <ClockCircleOutlined style={{ color: '#657786', fontSize: 18 }} />
                         )}
-                        <Typography.Text strong style={{ fontSize: 16 }}>
+                        <Typography.Text strong style={{ fontSize: 14 }}>
                           任务编号：{shortId}
                         </Typography.Text>
                         {modeTag(t.mode)}
                         <Badge
                           count={`${t.regions?.length ?? run?.region_count ?? 0} 个地区`}
-                          style={{ backgroundColor: '#52c41a' }}
+                          style={{ backgroundColor: '#52c41a', fontSize: 12 }}
                         />
                       </Flex>
-                      <Flex gap={20} wrap="wrap" style={{ fontSize: 14 }}>
+                      <Flex gap={16} wrap="wrap" style={{ fontSize: 13 }}>
                         <Space size={6}>
                           <Typography.Text type="secondary">启动：</Typography.Text>
                           <Typography.Text>{start}</Typography.Text>
@@ -183,7 +183,7 @@ export default function TasksPage() {
                           danger
                           icon={<StopOutlined />}
                           onClick={() => handleStop(t.task_id)}
-                          size="middle"
+                          size="small"
                         >
                           结束任务
                         </Button>
@@ -196,11 +196,11 @@ export default function TasksPage() {
           )}
         </Card>
       ) : (
-        <Card className="card" style={{ padding: '32px' }} loading={loading}>
+        <Card className="card" style={{ padding: '20px' }} loading={loading}>
           {closedRuns.length === 0 ? (
             <Empty
-              description={<span style={{ color: '#8c8c8c', fontSize: 15 }}>暂无已结束的任务</span>}
-              style={{ padding: '60px 0' }}
+              description={<span style={{ color: '#8c8c8c', fontSize: 13 }}>暂无已结束的任务</span>}
+              style={{ padding: '40px 0' }}
             />
           ) : (
             <List
@@ -216,28 +216,28 @@ export default function TasksPage() {
                   <List.Item
                     key={item.id}
                     style={{
-                      padding: '20px',
-                      marginBottom: 16,
+                      padding: '14px',
+                      marginBottom: 12,
                       background: '#fafafa',
-                      borderRadius: 12,
+                      borderRadius: 8,
                       border: '1px solid #f0f0f0',
                       transition: 'all 0.3s ease',
                     }}
                     className="task-list-item"
                   >
-                    <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                      <Flex align="center" gap={12} wrap="wrap">
-                        <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: 20 }} />
-                        <Typography.Text strong style={{ fontSize: 16 }}>
+                    <Space direction="vertical" size={10} style={{ width: '100%' }}>
+                      <Flex align="center" gap={10} wrap="wrap">
+                        <CheckCircleTwoTone twoToneColor="#52c41a" style={{ fontSize: 18 }} />
+                        <Typography.Text strong style={{ fontSize: 14 }}>
                           任务编号：{item.id.slice(0, 8)}
                         </Typography.Text>
                         {modeTag(item.mode)}
                         <Badge
                           count={`${item.region_count} 个地区`}
-                          style={{ backgroundColor: '#52c41a' }}
+                          style={{ backgroundColor: '#52c41a', fontSize: 12 }}
                         />
                       </Flex>
-                      <Flex gap={20} wrap="wrap" style={{ fontSize: 14 }}>
+                      <Flex gap={16} wrap="wrap" style={{ fontSize: 13 }}>
                         <Space size={6}>
                           <Typography.Text type="secondary">启动：</Typography.Text>
                           <Typography.Text>{start}</Typography.Text>
@@ -263,10 +263,10 @@ export default function TasksPage() {
                         type="secondary"
                         style={{
                           marginBottom: 0,
-                          fontSize: 13,
-                          padding: '8px 12px',
+                          fontSize: 12,
+                          padding: '6px 10px',
                           background: 'white',
-                          borderRadius: 8,
+                          borderRadius: 6,
                         }}
                       >
                         <span style={{ fontWeight: 500 }}>覆盖地区：</span>

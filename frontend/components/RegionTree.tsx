@@ -68,22 +68,55 @@ export default function RegionTree({ value, onChange }: Props) {
     }
   };
 
+  const getAllKeys = (nodes: DataNode[]): string[] => {
+    const keys: string[] = [];
+    const traverse = (n: DataNode[]) => {
+      for (const node of n) {
+        keys.push(node.key as string);
+        if (node.children) traverse(node.children);
+      }
+    };
+    traverse(nodes);
+    return keys;
+  };
+
+  const handleSelectAll = () => {
+    const allKeys = getAllKeys(treeData);
+    onChange(allKeys);
+  };
+
+  const handleClearAll = () => {
+    onChange([]);
+  };
+
+  const allKeys = getAllKeys(treeData);
+  const isAllSelected = allKeys.length > 0 && value.length === allKeys.length;
+
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       <Space align="center" style={{ width: '100%', justifyContent: 'space-between' }}>
         <Typography.Text strong>地区列表</Typography.Text>
-        <Button size="small" icon={<ReloadOutlined />} onClick={handleRefresh} loading={refreshing}>
-          刷新
-        </Button>
+        <Space size="small">
+          <Button
+            size="small"
+            type={isAllSelected ? 'default' : 'primary'}
+            onClick={isAllSelected ? handleClearAll : handleSelectAll}
+          >
+            {isAllSelected ? '取消全选' : '全选'}
+          </Button>
+          <Button size="small" icon={<ReloadOutlined />} onClick={handleRefresh} loading={refreshing}>
+            刷新
+          </Button>
+        </Space>
       </Space>
       <div
         style={{
-          maxHeight: 320,
+          flex: 1,
           overflow: 'auto',
-          marginTop: 12,
+          marginTop: 8,
           border: '1px solid #e6ecf0',
-          borderRadius: 12,
-          padding: 12,
+          borderRadius: 8,
+          padding: 10,
           background: '#fff',
         }}
       >

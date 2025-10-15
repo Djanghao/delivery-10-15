@@ -34,16 +34,16 @@ export default function LogConsole({ logs, onRefresh, onClear }: Props) {
   }, [logs]);
 
   return (
-    <div className="card" style={{ padding: 24, background: '#15202b' }}>
-      <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 12 }}>
-        <Typography.Title level={4} style={{ margin: 0, color: '#e6ecf0' }}>
+    <div className="card" style={{ padding: 16, background: '#15202b' }}>
+      <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 10 }}>
+        <Typography.Title level={5} style={{ margin: 0, color: '#e6ecf0', fontSize: 14 }}>
           爬取日志
         </Typography.Title>
-        <Space>
-          <Button icon={<ReloadOutlined />} onClick={onRefresh}>
+        <Space size="small">
+          <Button size="small" icon={<ReloadOutlined />} onClick={onRefresh}>
             刷新
           </Button>
-          <Button icon={<ClearOutlined />} danger onClick={onClear}>
+          <Button size="small" icon={<ClearOutlined />} danger onClick={onClear}>
             清空
           </Button>
         </Space>
@@ -51,7 +51,7 @@ export default function LogConsole({ logs, onRefresh, onClear }: Props) {
       <div
         ref={containerRef}
         className="dark-console"
-        style={{ maxHeight: 320, overflowY: 'auto', borderRadius: 12, border: '1px solid #273340' }}
+        style={{ maxHeight: 280, overflowY: 'auto', borderRadius: 8, border: '1px solid #273340' }}
       >
         {logs.map((log) => {
           const time = new Date(log.timestamp).toLocaleTimeString('zh-CN', { hour12: false });
