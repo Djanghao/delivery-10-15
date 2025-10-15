@@ -77,10 +77,12 @@
 sudo apt update
 sudo apt install python3 python3-pip python3-venv nginx
 
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install nodejs
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
 
-sudo npm install -g pm2
+npm install -g pm2
 ```
 
 ### 部署步骤
