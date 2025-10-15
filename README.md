@@ -63,8 +63,79 @@
   - 命中项目表格（Ant Design Table）
   - 任务执行摘要（模式 / 地区数 / 事项数 / 合格项目数）
 
+## 生产部署（阿里云 ECS）
+
+### 服务器准备
+
+- 配置：2核4G以上
+- 系统：Ubuntu 20.04/22.04
+- 开放端口：80, 443, 22
+
+### 环境安装
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip python3-venv nginx
+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install nodejs
+
+sudo npm install -g pm2
+```
+
+### 部署步骤
+
+```bash
+git clone https://github.com/your-username/gov-stats-crawler.git
+cd gov-stats-crawler
+
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pm2 start "uvicorn app.main:app --host 0.0.0.0 --port 8010" --name backend
+
+cd ../frontend
+npm install
+npm run build
+pm2 start npm --name frontend -- start
+
+pm2 save
+pm2 startup
+```
+
+### Nginx 配置
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location /api {
+        proxy_pass http://localhost:8010;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+保存至 `/etc/nginx/sites-available/gov-stats`，然后：
+
+```bash
+sudo ln -s /etc/nginx/sites-available/gov-stats /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
 ## 注意事项
 
 - 网络访问受限环境下，爬虫可能无法直接访问浙江政务平台，请提前确认出口策略。
 - 任务执行日志写入文件，无需额外数据库表，保持目录整洁即可。
 - 如需扩展自动调度，可在 `backend/app/services/task_manager.py` 中引入定时器/消息队列。
+- 首次启动时 `app.db` 和必要目录会自动创建。
