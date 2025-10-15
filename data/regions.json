@@ -1,0 +1,805 @@
+[
+  {
+    "id": "330100",
+    "name": "杭州市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330102",
+        "name": "上城区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330105",
+        "name": "拱墅区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330106",
+        "name": "西湖区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330108",
+        "name": "滨江区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330109",
+        "name": "萧山区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330110",
+        "name": "余杭区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330111",
+        "name": "富阳区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330112",
+        "name": "临安区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330113",
+        "name": "临平区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330114",
+        "name": "钱塘区",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330122",
+        "name": "桐庐县",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330127",
+        "name": "淳安县",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330150",
+        "name": "杭州西湖风景名胜区管理委员会",
+        "parent_id": "330100",
+        "children": []
+      },
+      {
+        "id": "330182",
+        "name": "建德市",
+        "parent_id": "330100",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330200",
+    "name": "宁波市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330203",
+        "name": "海曙区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330205",
+        "name": "江北区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330206",
+        "name": "北仑区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330211",
+        "name": "镇海区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330212",
+        "name": "鄞州区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330213",
+        "name": "奉化区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330225",
+        "name": "象山县",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330226",
+        "name": "宁海县",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330251",
+        "name": "大榭开发区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330252",
+        "name": "宁波前湾新区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330254",
+        "name": "宁波高新区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330255",
+        "name": "保税区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330256",
+        "name": "东钱湖",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330257",
+        "name": "宁波石化经济技术开发区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330258",
+        "name": "宁波临空经济示范区",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330281",
+        "name": "余姚市",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330282",
+        "name": "慈溪市",
+        "parent_id": "330200",
+        "children": []
+      },
+      {
+        "id": "330293",
+        "name": "宁波梅山物流产业集聚区",
+        "parent_id": "330200",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330300",
+    "name": "温州市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330302",
+        "name": "鹿城区",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330303",
+        "name": "龙湾区",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330304",
+        "name": "瓯海区",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330305",
+        "name": "洞头区",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330324",
+        "name": "永嘉县",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330326",
+        "name": "平阳县",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330327",
+        "name": "苍南县",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330328",
+        "name": "文成县",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330329",
+        "name": "泰顺县",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330353",
+        "name": "温州浙南科技城管理委员会",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330354",
+        "name": "生态园",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330355",
+        "name": "海经区",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330371",
+        "name": "温州湾新区",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330381",
+        "name": "瑞安市",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330382",
+        "name": "乐清市",
+        "parent_id": "330300",
+        "children": []
+      },
+      {
+        "id": "330383",
+        "name": "龙港市",
+        "parent_id": "330300",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330400",
+    "name": "嘉兴市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330402",
+        "name": "南湖区",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330411",
+        "name": "秀洲区",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330421",
+        "name": "嘉善县",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330424",
+        "name": "海盐县",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330451",
+        "name": "嘉兴经济技术开发区",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330452",
+        "name": "浙江乍浦经济开发区（嘉兴港区）",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330481",
+        "name": "海宁市",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330482",
+        "name": "平湖市",
+        "parent_id": "330400",
+        "children": []
+      },
+      {
+        "id": "330483",
+        "name": "桐乡市",
+        "parent_id": "330400",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330500",
+    "name": "湖州市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330502",
+        "name": "吴兴区",
+        "parent_id": "330500",
+        "children": []
+      },
+      {
+        "id": "330503",
+        "name": "南浔区",
+        "parent_id": "330500",
+        "children": []
+      },
+      {
+        "id": "330521",
+        "name": "德清县",
+        "parent_id": "330500",
+        "children": []
+      },
+      {
+        "id": "330522",
+        "name": "长兴县",
+        "parent_id": "330500",
+        "children": []
+      },
+      {
+        "id": "330523",
+        "name": "安吉县",
+        "parent_id": "330500",
+        "children": []
+      },
+      {
+        "id": "330552",
+        "name": "南太湖新区",
+        "parent_id": "330500",
+        "children": []
+      },
+      {
+        "id": "330554",
+        "name": "长合区",
+        "parent_id": "330500",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330600",
+    "name": "绍兴市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330602",
+        "name": "越城区",
+        "parent_id": "330600",
+        "children": []
+      },
+      {
+        "id": "330603",
+        "name": "柯桥区",
+        "parent_id": "330600",
+        "children": []
+      },
+      {
+        "id": "330604",
+        "name": "上虞区",
+        "parent_id": "330600",
+        "children": []
+      },
+      {
+        "id": "330624",
+        "name": "新昌县",
+        "parent_id": "330600",
+        "children": []
+      },
+      {
+        "id": "330652",
+        "name": "绍兴滨海新区管理委员会",
+        "parent_id": "330600",
+        "children": []
+      },
+      {
+        "id": "330654",
+        "name": "镜湖新区",
+        "parent_id": "330600",
+        "children": []
+      },
+      {
+        "id": "330681",
+        "name": "诸暨市",
+        "parent_id": "330600",
+        "children": []
+      },
+      {
+        "id": "330683",
+        "name": "嵊州市",
+        "parent_id": "330600",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330700",
+    "name": "金华市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330702",
+        "name": "婺城区",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330703",
+        "name": "金东区",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330723",
+        "name": "武义县",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330726",
+        "name": "浦江县",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330727",
+        "name": "磐安县",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330751",
+        "name": "金华开发区",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330752",
+        "name": "金义都市新区",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330753",
+        "name": "金华双龙风景旅游区",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330781",
+        "name": "兰溪市",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330782",
+        "name": "义乌市",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330783",
+        "name": "东阳市",
+        "parent_id": "330700",
+        "children": []
+      },
+      {
+        "id": "330784",
+        "name": "永康市",
+        "parent_id": "330700",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330800",
+    "name": "衢州市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330802",
+        "name": "柯城区",
+        "parent_id": "330800",
+        "children": []
+      },
+      {
+        "id": "330803",
+        "name": "衢江区",
+        "parent_id": "330800",
+        "children": []
+      },
+      {
+        "id": "330822",
+        "name": "常山县",
+        "parent_id": "330800",
+        "children": []
+      },
+      {
+        "id": "330824",
+        "name": "开化县",
+        "parent_id": "330800",
+        "children": []
+      },
+      {
+        "id": "330825",
+        "name": "龙游县",
+        "parent_id": "330800",
+        "children": []
+      },
+      {
+        "id": "330851",
+        "name": "衢州市智造新城",
+        "parent_id": "330800",
+        "children": []
+      },
+      {
+        "id": "330852",
+        "name": "衢州市智慧新城",
+        "parent_id": "330800",
+        "children": []
+      },
+      {
+        "id": "330881",
+        "name": "江山市",
+        "parent_id": "330800",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "330900",
+    "name": "舟山市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "330902",
+        "name": "定海区",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330903",
+        "name": "普陀区",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330921",
+        "name": "岱山县",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330922",
+        "name": "嵊泗县",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330951",
+        "name": "舟山高新技术产业园区管理委员会",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330952",
+        "name": "新城管委会",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330953",
+        "name": "普陀山-朱家尖管委会",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330954",
+        "name": "金塘管委会",
+        "parent_id": "330900",
+        "children": []
+      },
+      {
+        "id": "330955",
+        "name": "六横管委会",
+        "parent_id": "330900",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "331000",
+    "name": "台州市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "331002",
+        "name": "椒江区",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331003",
+        "name": "黄岩区",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331004",
+        "name": "路桥区",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331022",
+        "name": "三门县",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331023",
+        "name": "天台县",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331024",
+        "name": "仙居县",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331052",
+        "name": "台州湾新区",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331081",
+        "name": "温岭市",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331082",
+        "name": "临海市",
+        "parent_id": "331000",
+        "children": []
+      },
+      {
+        "id": "331083",
+        "name": "玉环市",
+        "parent_id": "331000",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "331100",
+    "name": "丽水市",
+    "parent_id": "330000",
+    "children": [
+      {
+        "id": "331102",
+        "name": "莲都区",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331121",
+        "name": "青田县",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331122",
+        "name": "缙云县",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331123",
+        "name": "遂昌县",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331124",
+        "name": "松阳县",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331125",
+        "name": "云和县",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331126",
+        "name": "庆元县",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331127",
+        "name": "景宁畲族自治县",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331151",
+        "name": "丽水经济技术开发区",
+        "parent_id": "331100",
+        "children": []
+      },
+      {
+        "id": "331181",
+        "name": "龙泉市",
+        "parent_id": "331100",
+        "children": []
+      }
+    ]
+  }
+]

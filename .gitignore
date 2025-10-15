@@ -24,13 +24,15 @@ build/
 coverage/
 
 # App runtime data (DB, logs)
-data/
+data/downloads/
+data/logs/
+data/tmp/
+data/*.db
 backend/data/
 *.sqlite
 *.sqlite3
-*.db
 *.log
 
-# Keep empty data folders if needed
+!data/regions.json
 !data/.gitkeep
 !backend/data/.gitkeep
