@@ -167,14 +167,23 @@ class CrawlerService:
         items: List[ItemSummary] = []
         page_no = 0
         found = False
+        total_pages = 0
         while True:
             page = self.client.get_item_page(region_code, page_no)
+            total_pages = page.total_pages
+            new_items_count = 0
             for entry in page.items:
                 if entry.sendid == pivot:
                     found = True
                     break
                 items.append(entry)
-            # 总页数是数量，最后一页索引是 total_pages-1
+                new_items_count += 1
+            display_idx = page_no + 1
+            append_log(
+                "INFO",
+                f"地区 {region_code} 增量扫描 - 第 {display_idx}/{total_pages} 页，新增事项 {new_items_count} 条"
+                + (f"，找到 pivot" if found else "")
+            )
             if found or page_no >= (page.total_pages - 1):
                 break
             page_no += 1
