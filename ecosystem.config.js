@@ -2,10 +2,9 @@ module.exports = {
   apps: [
     {
       name: 'gov-stats-backend',
-      script: 'uvicorn',
+      script: './venv/bin/uvicorn',
       args: 'app.main:app --host 0.0.0.0 --port 8010',
       cwd: './backend',
-      interpreter: 'python3',
       instances: 1,
       autorestart: true,
       watch: false,

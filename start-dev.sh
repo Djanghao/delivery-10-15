@@ -27,8 +27,7 @@ fi
 echo ""
 echo "Starting backend on port 8010..."
 cd backend
-source venv/bin/activate
-uvicorn app.main:app --host 0.0.0.0 --port 8010 --reload &
+./venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8010 --reload &
 BACKEND_PID=$!
 cd ..
 
