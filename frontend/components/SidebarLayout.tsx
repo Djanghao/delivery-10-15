@@ -45,8 +45,8 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            padding: '16px 16px',
+            justifyContent: 'flex-start',
+            padding: '16px',
             minHeight: 64,
             position: 'sticky',
             top: 0,

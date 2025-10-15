@@ -5,3 +5,4 @@ pydantic==2.6.3
 python-multipart==0.0.9
 pdfplumber==0.11.4
 Pillow==10.4.0
+openpyxl==3.1.2
