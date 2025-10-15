@@ -11,17 +11,13 @@
 
 ## 后端（FastAPI）
 
-1. **创建虚拟环境**
-   ```bash
-   cd backend
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-2. **启动服务**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
 ### 关键接口
 
@@ -44,6 +40,7 @@
    ```
 2. 启动开发服务
    ```bash
+   cd frontend
    npm run dev
    ```
 3. 如需与后端联调，请在 `.env.local` 中配置：

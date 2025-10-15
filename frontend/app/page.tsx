@@ -136,7 +136,7 @@ export default function CrawlDashboard() {
                 message="使用说明"
                 description={
                   <span>
-                    先在左侧选择目标地区（勾选城市会自动包含下属区县，可按需增删），然后点击上方"历史爬取"或"增量爬取"按钮启动任务。
+                    先在左侧选择目标地区（勾选城市会自动包含下属区县，可按需增删），然后点击上方&ldquo;历史爬取&rdquo;或&ldquo;增量爬取&rdquo;按钮启动任务。
                     历史爬取会补齐历史命中项目；增量爬取仅处理上次 pivot 之后的新增事项，快速捕捉最新变更。
                   </span>
                 }
