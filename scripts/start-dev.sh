@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
+
+# Ensure we run from repo root regardless of where invoked
+cd "$(dirname "$0")/.."
 
 echo "Starting Gov Stats Crawler Platform (Development Mode)..."
 
@@ -10,6 +13,7 @@ if [ ! -d "backend/venv" ]; then
     python3 -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
+    deactivate || true
     cd ..
 else
     echo "Python virtual environment already exists"
