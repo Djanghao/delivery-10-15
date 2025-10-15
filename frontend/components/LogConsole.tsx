@@ -51,7 +51,7 @@ export default function LogConsole({ logs, onRefresh, onClear }: Props) {
       <div
         ref={containerRef}
         className="dark-console"
-        style={{ maxHeight: 280, overflowY: 'auto', borderRadius: 8, border: '1px solid #273340' }}
+        style={{ maxHeight: 420, overflowY: 'auto', borderRadius: 8, border: '1px solid #273340' }}
       >
         {logs.map((log) => {
           const time = new Date(log.timestamp).toLocaleTimeString('zh-CN', { hour12: false });

@@ -77,16 +77,20 @@ export default function ResultsPage() {
   }, [selectedRegions, regionNameMap, rootRegionIds]);
 
   const loadProjects = useCallback(
-    async (page = pagination.current ?? 1, pageSize = pagination.pageSize ?? 20) => {
+    async (
+      page = pagination.current ?? 1,
+      pageSize = pagination.pageSize ?? 20,
+      parsedKey: 'all' | 'parsed' | 'unparsed' = parsedFilter,
+    ) => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
         selectedRegions.forEach((region) => params.append('regions', region));
         params.set('page', String(page));
         params.set('size', String(pageSize));
-        if (parsedFilter === 'parsed') {
+        if (parsedKey === 'parsed') {
           params.set('parsed', 'true');
-        } else if (parsedFilter === 'unparsed') {
+        } else if (parsedKey === 'unparsed') {
           params.set('parsed', 'false');
         }
         const payload = await apiFetch<PaginatedProjects>(`/api/projects?${params.toString()}`);
@@ -112,8 +116,9 @@ export default function ResultsPage() {
   };
 
   const handleTabChange = async (key: string) => {
-    setParsedFilter(key as 'all' | 'parsed' | 'unparsed');
-    await loadProjects(1, pagination.pageSize ?? 20);
+    const next = key as 'all' | 'parsed' | 'unparsed';
+    setParsedFilter(next);
+    await loadProjects(1, pagination.pageSize ?? 20, next);
   };
 
   const columns: ColumnsType<ProjectItem> = [

@@ -10,7 +10,7 @@
 - `scripts/server-stop.sh`：停止 PM2 管理的所有进程（本项目）
 - `scripts/server-restart.sh`：重启 PM2 进程
 - `scripts/server-status.sh`：查看 PM2 状态与日志命令
-- `scripts/start-dev.sh`：本地开发（前端 dev + 后端 uvicorn --reload）
+- `scripts/start-local.sh`：本地开发（前端 dev + 后端 uvicorn --reload）
 - `ecosystem.config.js`：PM2 配置（后端 `gov-crawler-backend`，前端 `gov-crawler-frontend`）
 
 ---
@@ -22,7 +22,7 @@
 开发模式（热更新）：
 
 ```bash
-./scripts/start-dev.sh
+./scripts/start-local.sh
 # 前端: http://localhost:6060
 # 后端: http://localhost:8010  (Swagger: /docs)
 ```

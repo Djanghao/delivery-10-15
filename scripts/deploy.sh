@@ -27,13 +27,35 @@ fi
 
 echo "Building frontend..."
 cd frontend
+echo "Cleaning previous build artifacts (.next)..."
+rm -rf .next
+
+# Prepare production env for Next.js build
+if [ -f .env.local ]; then
+  mv .env.local .env.local.backup
+  echo "Backed up frontend/.env.local → frontend/.env.local.backup"
+fi
+if [ -f ../.env.production ]; then
+  cp -f ../.env.production .env.production
+  echo "Copied .env.production → frontend/.env.production"
+fi
+
 npm run build
+
+# Restore local env if it was present
+if [ -f .env.local.backup ]; then
+  mv .env.local.backup .env.local
+  echo "Restored frontend/.env.local"
+fi
 cd ..
 
 echo "Deploying to $SERVER_USER@$SERVER_IP:$REMOTE_DIR"
 
 echo "Ensuring remote directories exist..."
-SSH "mkdir -p '$REMOTE_DIR/backend' '$REMOTE_DIR/frontend' '$REMOTE_DIR/scripts'"
+SSH "mkdir -p '$REMOTE_DIR/backend' '$REMOTE_DIR/scripts'"
+
+echo "Cleaning remote frontend directory..."
+SSH "rm -rf '$REMOTE_DIR/frontend' && mkdir -p '$REMOTE_DIR/frontend'"
 
 echo "Syncing backend and frontend build to server..."
 RSYNC \

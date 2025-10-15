@@ -5,7 +5,7 @@ set -euo pipefail
 # Ensure we run from repo root regardless of where invoked
 cd "$(dirname "$0")/.."
 
-echo "Starting Gov Stats Crawler Platform (Development Mode)..."
+echo "Starting Gov Stats Crawler Platform (Local Dev Mode)..."
 
 if [ ! -d "backend/venv" ]; then
     echo "Setting up Python virtual environment..."
@@ -53,3 +53,4 @@ echo ""
 trap "echo 'Stopping services...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" INT TERM
 
 wait
+
