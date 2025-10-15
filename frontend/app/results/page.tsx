@@ -1,6 +1,6 @@
 'use client';
 
-import { App, Button, Card, Col, Flex, Popconfirm, Row, Space, Table, Tag, Typography } from 'antd';
+import { App, Button, Card, Col, Flex, Popconfirm, Row, Space, Table, Tabs, Tag, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { DeleteOutlined, DownloadOutlined, FilterOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -35,6 +35,7 @@ export default function ResultsPage() {
   const [deleting, setDeleting] = useState(false);
   const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
   const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
+  const [parsedFilter, setParsedFilter] = useState<'all' | 'parsed' | 'unparsed'>('all');
 
   const [detailVisible, setDetailVisible] = useState(false);
   const [selectedProjectUUID, setSelectedProjectUUID] = useState<string | null>(null);
@@ -83,6 +84,11 @@ export default function ResultsPage() {
         selectedRegions.forEach((region) => params.append('regions', region));
         params.set('page', String(page));
         params.set('size', String(pageSize));
+        if (parsedFilter === 'parsed') {
+          params.set('parsed', 'true');
+        } else if (parsedFilter === 'unparsed') {
+          params.set('parsed', 'false');
+        }
         const payload = await apiFetch<PaginatedProjects>(`/api/projects?${params.toString()}`);
         setProjects(payload.items);
         setPagination({ current: payload.page, pageSize: payload.size, total: payload.total });
@@ -90,7 +96,7 @@ export default function ResultsPage() {
         setLoading(false);
       }
     },
-    [selectedRegions],
+    [selectedRegions, parsedFilter],
   );
 
   const handleFilter = async () => {
@@ -103,6 +109,11 @@ export default function ResultsPage() {
 
   const handleTableChange = async (pager: TablePaginationConfig) => {
     await loadProjects(pager.current ?? 1, pager.pageSize ?? 20);
+  };
+
+  const handleTabChange = async (key: string) => {
+    setParsedFilter(key as 'all' | 'parsed' | 'unparsed');
+    await loadProjects(1, pagination.pageSize ?? 20);
   };
 
   const columns: ColumnsType<ProjectItem> = [
@@ -224,6 +235,16 @@ export default function ResultsPage() {
         <Typography.Title level={4} style={{ marginBottom: 16 }}>
           项目列表
         </Typography.Title>
+        <Tabs
+          activeKey={parsedFilter}
+          onChange={handleTabChange}
+          items={[
+            { key: 'all', label: '全部' },
+            { key: 'parsed', label: '已解析' },
+            { key: 'unparsed', label: '未解析' },
+          ]}
+          style={{ marginBottom: 16 }}
+        />
         <Table<ProjectItem>
           columns={columns}
           dataSource={projects}

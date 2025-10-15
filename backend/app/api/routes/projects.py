@@ -26,6 +26,7 @@ router = APIRouter(prefix="/api/projects", tags=["projects"])
 def list_projects(
     region: str | None = Query(default=None),
     regions: List[str] = Query(default_factory=list),
+    parsed: bool | None = Query(default=None),
     page: int = Query(default=1, ge=1),
     size: int = Query(default=20, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -36,6 +37,9 @@ def list_projects(
     if selected:
         query = query.where(ValuableProject.region_code.in_(selected))
         count_query = count_query.where(ValuableProject.region_code.in_(selected))
+    if parsed is not None:
+        query = query.where(ValuableProject.parsed_pdf == parsed)
+        count_query = count_query.where(ValuableProject.parsed_pdf == parsed)
     query = query.order_by(ValuableProject.discovered_at.desc()).offset((page - 1) * size).limit(size)
     items = db.scalars(query).all()
     total = int(db.scalar(count_query) or 0)

@@ -1,6 +1,6 @@
 'use client';
 
-import { App, Badge, Button, Card, Col, Flex, Image, Input, Modal, Row, Space, Spin, Table, Tag, Typography } from 'antd';
+import { App, Badge, Button, Card, Col, Flex, Image, Input, Modal, Row, Space, Spin, Table, Tabs, Tag, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { FilterOutlined, PlayCircleOutlined, StopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -43,6 +43,7 @@ export default function ExtractPage() {
   const [loading, setLoading] = useState(false);
   const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
   const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
+  const [parsedFilter, setParsedFilter] = useState<'all' | 'parsed' | 'unparsed'>('all');
 
   const [captchaVisible, setCaptchaVisible] = useState(false);
   const [captchaImage, setCaptchaImage] = useState<string>('');
@@ -104,6 +105,11 @@ export default function ExtractPage() {
         selectedRegions.forEach((region) => params.append('regions', region));
         params.set('page', String(page));
         params.set('size', String(pageSize));
+        if (parsedFilter === 'parsed') {
+          params.set('parsed', 'true');
+        } else if (parsedFilter === 'unparsed') {
+          params.set('parsed', 'false');
+        }
         const payload = await apiFetch<PaginatedProjects>(`/api/projects?${params.toString()}`);
         setProjects(payload.items);
         setPagination({ current: payload.page, pageSize: payload.size, total: payload.total });
@@ -111,7 +117,7 @@ export default function ExtractPage() {
         setLoading(false);
       }
     },
-    [selectedRegions],
+    [selectedRegions, parsedFilter],
   );
 
   const handleFilter = async () => {
@@ -124,6 +130,11 @@ export default function ExtractPage() {
 
   const handleTableChange = async (pager: TablePaginationConfig) => {
     await loadProjects(pager.current ?? 1, pager.pageSize ?? 20);
+  };
+
+  const handleTabChange = async (key: string) => {
+    setParsedFilter(key as 'all' | 'parsed' | 'unparsed');
+    await loadProjects(1, pagination.pageSize ?? 20);
   };
 
   const columns: ColumnsType<ProjectItem> = [
@@ -258,8 +269,8 @@ export default function ExtractPage() {
         setCaptchaCode('');
         message.error('验证码错误，请重试');
         setCaptchaSubmitting(false);
-        setCaptchaLoading(false);
         setTimeout(() => {
+          setCaptchaLoading(false);
           captchaInputRef.current?.focus();
         }, 100);
         return;
@@ -272,15 +283,10 @@ export default function ExtractPage() {
           projectuuid: ctx.project.projectuuid,
         }),
       });
-      setCaptchaSubmitting(false);
-      setCaptchaLoading(false);
       setCaptchaCode('');
       message.success(`已解析：${ctx.project.project_name}`);
       const ev = new CustomEvent('parse-step-finished', { detail: { success: true } });
       window.dispatchEvent(ev);
-      setTimeout(() => {
-        captchaInputRef.current?.focus();
-      }, 100);
     } catch (err) {
       message.error((err as Error).message || '处理失败');
       setCaptchaSubmitting(false);
@@ -323,6 +329,16 @@ export default function ExtractPage() {
         <Typography.Title level={4} style={{ marginBottom: 16 }}>
           命中项目列表
         </Typography.Title>
+        <Tabs
+          activeKey={parsedFilter}
+          onChange={handleTabChange}
+          items={[
+            { key: 'all', label: '全部' },
+            { key: 'parsed', label: '已解析' },
+            { key: 'unparsed', label: '未解析' },
+          ]}
+          style={{ marginBottom: 16 }}
+        />
         <Table<ProjectItem>
           columns={columns}
           dataSource={projects}
