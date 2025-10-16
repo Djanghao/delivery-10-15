@@ -30,6 +30,38 @@ class CrawlerService:
     def __init__(self, client: Optional[PublicAnnouncementClient] = None) -> None:
         self.client = client or PublicAnnouncementClient()
 
+    def _build_region_name_map(self, region_codes: List[str]) -> Dict[str, str]:
+        from ..config import DATA_DIR
+
+        cache_file = DATA_DIR / "regions.json"
+        if not cache_file.exists():
+            return {code: code for code in region_codes}
+
+        try:
+            data = json.loads(cache_file.read_text(encoding="utf-8"))
+        except Exception:
+            return {code: code for code in region_codes}
+
+        mapping: Dict[str, str] = {}
+        parent_map: Dict[str, str] = {}
+
+        def traverse(node: dict, parent_name: Optional[str] = None) -> None:
+            node_id = node.get("id")
+            node_name = node.get("name", node_id)
+            if node_id:
+                if parent_name and parent_name != node_name:
+                    mapping[node_id] = f"{parent_name}/{node_name}"
+                else:
+                    mapping[node_id] = node_name
+                parent_map[node_id] = parent_name or ""
+            for child in node.get("children", []):
+                traverse(child, node_name)
+
+        for region in data:
+            traverse(region)
+
+        return {code: mapping.get(code, code) for code in region_codes}
+
     def fetch_region_tree(self) -> List[RegionNode]:
         regions = self.client.get_regions()
         nodes: Dict[str, RegionNode] = {
@@ -70,7 +102,9 @@ class CrawlerService:
         )
         session.add(crawl_run)
         session.commit()
-        append_log("INFO", f"任务 {run_id} 开始，模式 {mode}，地区 {','.join(region_codes)}")
+        region_name_map = self._build_region_name_map(region_codes)
+        region_names = [region_name_map.get(code, code) for code in region_codes]
+        append_log("INFO", f"任务 {run_id} 开始，模式 {mode}，地区 {','.join(region_names)}")
         stats = CrawlStats()
         try:
             for region_code in region_codes:
@@ -78,9 +112,9 @@ class CrawlerService:
                     append_log("INFO", f"任务 {run_id} 已请求终止，停止后续处理")
                     break
                 if mode == "history":
-                    self._run_history_for_region(session, region_code, stats, should_stop=should_stop)
+                    self._run_history_for_region(session, region_code, stats, region_name_map, should_stop=should_stop)
                 else:
-                    self._run_incremental_for_region(session, region_code, stats, should_stop=should_stop)
+                    self._run_incremental_for_region(session, region_code, stats, region_name_map, should_stop=should_stop)
             crawl_run.total_items = stats.total_items
             crawl_run.valuable_projects = stats.valuable_projects
             crawl_run.finished_at = datetime.utcnow()
@@ -98,9 +132,16 @@ class CrawlerService:
         return crawl_run
 
     def _run_history_for_region(
-        self, session: Session, region_code: str, stats: CrawlStats, *, should_stop: Optional[Callable[[], bool]] = None
+        self,
+        session: Session,
+        region_code: str,
+        stats: CrawlStats,
+        region_name_map: Dict[str, str],
+        *,
+        should_stop: Optional[Callable[[], bool]] = None,
     ) -> None:
-        append_log("INFO", f"地区 {region_code} 历史爬取开始")
+        region_name = region_name_map.get(region_code, region_code)
+        append_log("INFO", f"地区 {region_name} 历史爬取开始")
         # 先探测总页数（接口 pageNo 支持从 0 开始）
         first_page = self.client.get_item_page(region_code, 0)
         total_pages = first_page.total_pages
@@ -111,13 +152,13 @@ class CrawlerService:
         # 倒序抓取：从最后一页索引(total_pages-1)到第 0 页
         for page_no in range(total_pages - 1, -1, -1):
             if should_stop and should_stop():
-                append_log("INFO", f"地区 {region_code} 历史爬取中止")
+                append_log("INFO", f"地区 {region_name} 历史爬取中止")
                 break
             current_page = self.client.get_item_page(region_code, page_no)
             before_total = stats.total_items
             before_matched = stats.matched_projects
             before_saved = stats.valuable_projects
-            self._process_items(session, region_code, reversed(current_page.items), stats, should_stop=should_stop)
+            self._process_items(session, region_code, reversed(current_page.items), stats, region_name_map, should_stop=should_stop)
             page_items = len(current_page.items)
             delta_total = stats.total_items - before_total
             delta_matched = stats.matched_projects - before_matched
@@ -127,7 +168,7 @@ class CrawlerService:
                 append_log(
                     "INFO",
                     (
-                        f"地区 {region_code} 历史爬取 - 第 {display_idx}/{total_pages} 页，"
+                        f"地区 {region_name} 历史爬取 - 第 {display_idx}/{total_pages} 页，"
                         f"事项 {page_items} 条，命中 {delta_matched} 个，新入库 {delta_saved} 个"
                     ),
                 )
@@ -138,35 +179,43 @@ class CrawlerService:
         region_total = stats.total_items - before_region_total
         region_matched = stats.matched_projects - before_region_matched
         region_saved = stats.valuable_projects - before_region_saved
-        append_log("INFO", f"✓ 地区 {region_code} 历史爬取完成：累计事项 {region_total} 条，命中 {region_matched} 个，新入库 {region_saved} 个")
+        append_log("INFO", f"✓ 地区 {region_name} 历史爬取完成：累计事项 {region_total} 条，命中 {region_matched} 个，新入库 {region_saved} 个")
 
     def _run_incremental_for_region(
-        self, session: Session, region_code: str, stats: CrawlStats, *, should_stop: Optional[Callable[[], bool]] = None
+        self,
+        session: Session,
+        region_code: str,
+        stats: CrawlStats,
+        region_name_map: Dict[str, str],
+        *,
+        should_stop: Optional[Callable[[], bool]] = None,
     ) -> None:
-        append_log("INFO", f"地区 {region_code} 增量爬取开始")
+        region_name = region_name_map.get(region_code, region_code)
+        append_log("INFO", f"地区 {region_name} 增量爬取开始")
         progress = session.get(CrawlProgress, region_code)
         if not progress or not progress.last_pivot_sendid:
-            append_log("INFO", f"地区 {region_code} 无历史 pivot，执行全量补齐")
-            self._run_history_for_region(session, region_code, stats, should_stop=should_stop)
+            append_log("INFO", f"地区 {region_name} 无历史 pivot，执行全量补齐")
+            self._run_history_for_region(session, region_code, stats, region_name_map, should_stop=should_stop)
             return
         pivot = progress.last_pivot_sendid
-        new_items = self._collect_items_after_pivot(region_code, pivot)
+        new_items = self._collect_items_after_pivot(region_code, pivot, region_name_map)
         if not new_items:
-            append_log("INFO", f"✓ 地区 {region_code} 增量爬取完成：无新增事项")
+            append_log("INFO", f"✓ 地区 {region_name} 增量爬取完成：无新增事项")
             return
         before_matched = stats.matched_projects
         before_saved = stats.valuable_projects
         before_total = stats.total_items
-        self._process_items(session, region_code, new_items, stats, should_stop=should_stop)
+        self._process_items(session, region_code, new_items, stats, region_name_map, should_stop=should_stop)
         delta_total = stats.total_items - before_total
         delta_matched = stats.matched_projects - before_matched
         delta_saved = stats.valuable_projects - before_saved
         latest = next(iter(new_items[::-1]), None)
         if latest:
             self._update_progress(session, region_code, latest.sendid)
-        append_log("INFO", f"✓ 地区 {region_code} 增量爬取完成：累计事项 {delta_total} 条，命中 {delta_matched} 个，新入库 {delta_saved} 个")
+        append_log("INFO", f"✓ 地区 {region_name} 增量爬取完成：累计事项 {delta_total} 条，命中 {delta_matched} 个，新入库 {delta_saved} 个")
 
-    def _collect_items_after_pivot(self, region_code: str, pivot: str) -> List[ItemSummary]:
+    def _collect_items_after_pivot(self, region_code: str, pivot: str, region_name_map: Dict[str, str]) -> List[ItemSummary]:
+        region_name = region_name_map.get(region_code, region_code)
         items: List[ItemSummary] = []
         page_no = 0
         found = False
@@ -184,14 +233,14 @@ class CrawlerService:
             display_idx = page_no + 1
             append_log(
                 "INFO",
-                f"地区 {region_code} 增量扫描 - 第 {display_idx}/{total_pages} 页，新增事项 {new_items_count} 条"
+                f"地区 {region_name} 增量扫描 - 第 {display_idx}/{total_pages} 页，新增事项 {new_items_count} 条"
                 + (f"，找到 pivot" if found else "")
             )
             if found or page_no >= (page.total_pages - 1):
                 break
             page_no += 1
         if not found:
-            append_log("WARNING", f"地区 {region_code} 未找到 pivot {pivot}，返回所有事项")
+            append_log("WARNING", f"地区 {region_name} 未找到 pivot {pivot}，返回所有事项")
         return list(reversed(items))
 
     def _process_items(
@@ -200,12 +249,14 @@ class CrawlerService:
         region_code: str,
         items: Iterable[ItemSummary],
         stats: CrawlStats,
+        region_name_map: Dict[str, str],
         *,
         should_stop: Optional[Callable[[], bool]] = None,
     ) -> None:
+        region_name = region_name_map.get(region_code, region_code)
         for item in items:
             if should_stop and should_stop():
-                append_log("INFO", f"地区 {region_code} 项目处理被中止")
+                append_log("INFO", f"地区 {region_name} 项目处理被中止")
                 break
             stats.total_items += 1
             project = session.get(ValuableProject, item.projectuuid)
@@ -219,7 +270,7 @@ class CrawlerService:
             MAX_RETRIES = 50
             while retry_count < MAX_RETRIES:
                 if should_stop and should_stop():
-                    append_log("INFO", f"地区 {region_code} 项目处理被中止（项目 {item.projectuuid}）")
+                    append_log("INFO", f"地区 {region_name} 项目处理被中止（项目 {item.projectuuid}）")
                     return
                 try:
                     detail = self.client.get_project_detail(item.projectuuid)
