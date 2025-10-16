@@ -301,9 +301,10 @@ class CrawlerService:
             else:
                 empty_items_count = 0
             if self._is_target_project(detail):
+                project_uuid = detail.projectuuid or item.projectuuid
                 session.merge(
                     ValuableProject(
-                        projectuuid=detail.projectuuid or item.projectuuid,
+                        projectuuid=project_uuid,
                         project_name=detail.project_name or "",
                         region_code=region_code,
                         discovered_at=datetime.utcnow(),
@@ -311,7 +312,7 @@ class CrawlerService:
                 )
                 stats.valuable_projects += 1
                 stats.matched_projects += 1
-                append_log("INFO", f"记录项目 {detail.projectuuid} - {detail.project_name}")
+                append_log("INFO", f"记录项目 {detail.project_name}")
             self._update_progress(session, region_code, item.sendid)
 
     def _update_progress(self, session: Session, region_code: str, sendid: str) -> None:
