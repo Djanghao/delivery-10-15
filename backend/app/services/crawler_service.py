@@ -254,6 +254,9 @@ class CrawlerService:
         should_stop: Optional[Callable[[], bool]] = None,
     ) -> None:
         region_name = region_name_map.get(region_code, region_code)
+        empty_items_count = 0
+        MAX_CONSECUTIVE_EMPTY = 10
+
         for item in items:
             if should_stop and should_stop():
                 append_log("INFO", f"地区 {region_name} 项目处理被中止")
@@ -261,9 +264,9 @@ class CrawlerService:
             stats.total_items += 1
             project = session.get(ValuableProject, item.projectuuid)
             if project:
-                # 已在库中，视为再次命中，不再重复拉详情
                 stats.matched_projects += 1
                 self._update_progress(session, region_code, item.sendid)
+                empty_items_count = 0
                 continue
             retry_count = 0
             detail = None
@@ -289,6 +292,14 @@ class CrawlerService:
                 append_log("WARNING", f"项目 {item.projectuuid} 无详情，忽略")
                 self._update_progress(session, region_code, item.sendid)
                 continue
+
+            if len(detail.items) == 0:
+                empty_items_count += 1
+                if empty_items_count >= MAX_CONSECUTIVE_EMPTY:
+                    append_log("ERROR", f"🚨 爬取中断 - 地区 {region_name} 连续{MAX_CONSECUTIVE_EMPTY}个项目返回空事项列表，原网站可能出现问题")
+                    return
+            else:
+                empty_items_count = 0
             if self._is_target_project(detail):
                 session.merge(
                     ValuableProject(

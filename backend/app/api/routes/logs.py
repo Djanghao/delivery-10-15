@@ -13,8 +13,8 @@ router = APIRouter(prefix="/api/logs", tags=["logs"])
 def _should_show_in_simple_mode(log: LogEntry) -> bool:
     msg = log.message
     return (
-        "🚨 CRITICAL" in msg
-        or (log.level == "ERROR" and "已重试50次" in msg)
+        "🚨" in msg
+        or (log.level == "ERROR" and ("已重试50次" in msg or "爬取中断" in msg))
         or "✓ 地区" in msg
         or ("任务" in msg and ("开始" in msg or "完成" in msg))
     )
