@@ -2,7 +2,7 @@
 
 import { Button, Space, Typography } from 'antd';
 import { ReloadOutlined, ClearOutlined } from '@ant-design/icons';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 export interface LogEntry {
   timestamp: string;
@@ -25,13 +25,6 @@ const levelColor: Record<string, string> = {
 
 export default function LogConsole({ logs, onRefresh, onClear }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-    }
-  }, [logs]);
 
   return (
     <div className="card" style={{ padding: 16, background: '#15202b' }}>

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
@@ -211,7 +212,21 @@ class CrawlerService:
                 stats.matched_projects += 1
                 self._update_progress(session, region_code, item.sendid)
                 continue
-            detail = self.client.get_project_detail(item.projectuuid)
+            retry_count = 0
+            detail = None
+            while True:
+                if should_stop and should_stop():
+                    append_log("INFO", f"地区 {region_code} 项目处理被中止（项目 {item.projectuuid}）")
+                    return
+                try:
+                    detail = self.client.get_project_detail(item.projectuuid)
+                    if retry_count > 0:
+                        append_log("INFO", f"✓ 项目 {item.projectuuid} 获取成功（重试 {retry_count} 次后）")
+                    break
+                except Exception as exc:
+                    retry_count += 1
+                    append_log("WARNING", f"⚠️ RETRY - 项目 {item.projectuuid} 获取失败（第 {retry_count} 次重试）: {exc}")
+                    time.sleep(2)
             if not detail:
                 append_log("WARNING", f"项目 {item.projectuuid} 无详情，忽略")
                 self._update_progress(session, region_code, item.sendid)

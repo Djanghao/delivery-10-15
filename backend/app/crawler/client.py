@@ -38,7 +38,7 @@ class PublicAnnouncementClient:
     BASE_URL = "https://tzxm.zjzwfw.gov.cn/publicannouncement.do"
     PAGE_SIZE = 10  # 官方接口每页固定返回 10 条
 
-    def __init__(self, timeout: float = 10.0, headers: Optional[dict] = None) -> None:
+    def __init__(self, timeout: float = 30.0, headers: Optional[dict] = None) -> None:
         self.timeout = timeout
         self.headers = dict(DEFAULT_HEADERS)
         if headers:
