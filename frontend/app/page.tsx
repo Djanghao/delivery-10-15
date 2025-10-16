@@ -20,11 +20,13 @@ export default function CrawlDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [statuses, setStatuses] = useState<TaskStatus[]>([]);
+  const [logMode, setLogMode] = useState<'detailed' | 'simple'>('detailed');
 
-  const refreshLogs = useCallback(async () => {
-    const data = await apiFetch<LogEntry[]>(`/api/logs?limit=300`);
+  const refreshLogs = useCallback(async (mode?: 'detailed' | 'simple') => {
+    const actualMode = mode ?? logMode;
+    const data = await apiFetch<LogEntry[]>(`/api/logs?limit=300&mode=${actualMode}`);
     setLogs(data);
-  }, []);
+  }, [logMode]);
 
   const refreshStatuses = useCallback(async () => {
     const data = await apiFetch<TaskStatus[]>(`/api/crawl/status?open_only=true`);
@@ -148,7 +150,7 @@ export default function CrawlDashboard() {
         </Row>
       </Card>
 
-      <LogConsole logs={logs} onRefresh={refreshLogs} onClear={handleClearLogs} />
+      <LogConsole logs={logs} mode={logMode} onModeChange={setLogMode} onRefresh={refreshLogs} onClear={handleClearLogs} />
 
       {/* 最近任务列表已移除，改由"任务管理"页面展示 */}
     </Flex>

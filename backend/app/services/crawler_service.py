@@ -105,6 +105,9 @@ class CrawlerService:
         first_page = self.client.get_item_page(region_code, 0)
         total_pages = first_page.total_pages
         last_sendid = None
+        before_region_total = stats.total_items
+        before_region_matched = stats.matched_projects
+        before_region_saved = stats.valuable_projects
         # 倒序抓取：从最后一页索引(total_pages-1)到第 0 页
         for page_no in range(total_pages - 1, -1, -1):
             if should_stop and should_stop():
@@ -132,7 +135,10 @@ class CrawlerService:
                 last_sendid = current_page.items[0].sendid
         if last_sendid:
             self._update_progress(session, region_code, last_sendid)
-        append_log("INFO", f"地区 {region_code} 历史爬取完成")
+        region_total = stats.total_items - before_region_total
+        region_matched = stats.matched_projects - before_region_matched
+        region_saved = stats.valuable_projects - before_region_saved
+        append_log("INFO", f"✓ 地区 {region_code} 历史爬取完成：累计事项 {region_total} 条，命中 {region_matched} 个，新入库 {region_saved} 个")
 
     def _run_incremental_for_region(
         self, session: Session, region_code: str, stats: CrawlStats, *, should_stop: Optional[Callable[[], bool]] = None
@@ -146,7 +152,7 @@ class CrawlerService:
         pivot = progress.last_pivot_sendid
         new_items = self._collect_items_after_pivot(region_code, pivot)
         if not new_items:
-            append_log("INFO", f"地区 {region_code} 无新增事项")
+            append_log("INFO", f"✓ 地区 {region_code} 增量爬取完成：无新增事项")
             return
         before_matched = stats.matched_projects
         before_saved = stats.valuable_projects
@@ -155,14 +161,10 @@ class CrawlerService:
         delta_total = stats.total_items - before_total
         delta_matched = stats.matched_projects - before_matched
         delta_saved = stats.valuable_projects - before_saved
-        append_log(
-            "INFO",
-            f"地区 {region_code} 增量处理完成：事项 {delta_total} 条，命中 {delta_matched} 个，新入库 {delta_saved} 个",
-        )
         latest = next(iter(new_items[::-1]), None)
         if latest:
             self._update_progress(session, region_code, latest.sendid)
-        append_log("INFO", f"地区 {region_code} 增量爬取完成")
+        append_log("INFO", f"✓ 地区 {region_code} 增量爬取完成：累计事项 {delta_total} 条，命中 {delta_matched} 个，新入库 {delta_saved} 个")
 
     def _collect_items_after_pivot(self, region_code: str, pivot: str) -> List[ItemSummary]:
         items: List[ItemSummary] = []
@@ -214,7 +216,8 @@ class CrawlerService:
                 continue
             retry_count = 0
             detail = None
-            while True:
+            MAX_RETRIES = 50
+            while retry_count < MAX_RETRIES:
                 if should_stop and should_stop():
                     append_log("INFO", f"地区 {region_code} 项目处理被中止（项目 {item.projectuuid}）")
                     return
@@ -225,7 +228,11 @@ class CrawlerService:
                     break
                 except Exception as exc:
                     retry_count += 1
-                    append_log("WARNING", f"⚠️ RETRY - 项目 {item.projectuuid} 获取失败（第 {retry_count} 次重试）: {exc}")
+                    if retry_count >= MAX_RETRIES:
+                        append_log("ERROR", f"🚨 CRITICAL - 项目 {item.projectuuid} 获取失败（已重试50次），跳过")
+                        detail = None
+                        break
+                    append_log("WARNING", f"⚠️ 项目 {item.projectuuid} 获取失败（第 {retry_count}/{MAX_RETRIES} 次重试）: {exc}")
                     time.sleep(2)
             if not detail:
                 append_log("WARNING", f"项目 {item.projectuuid} 无详情，忽略")

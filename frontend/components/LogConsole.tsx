@@ -1,8 +1,8 @@
 'use client';
 
-import { Button, Space, Typography } from 'antd';
+import { Button, Space, Typography, Segmented } from 'antd';
 import { ReloadOutlined, ClearOutlined } from '@ant-design/icons';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export interface LogEntry {
   timestamp: string;
@@ -12,7 +12,9 @@ export interface LogEntry {
 
 type Props = {
   logs: LogEntry[];
-  onRefresh: () => void;
+  mode: 'detailed' | 'simple';
+  onModeChange: (mode: 'detailed' | 'simple') => void;
+  onRefresh: (mode?: 'detailed' | 'simple') => void;
   onClear: () => Promise<void>;
 };
 
@@ -23,17 +25,34 @@ const levelColor: Record<string, string> = {
   ERROR: '#f4212e',
 };
 
-export default function LogConsole({ logs, onRefresh, onClear }: Props) {
+export default function LogConsole({ logs, mode, onModeChange, onRefresh, onClear }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleModeChange = (value: string | number) => {
+    const newMode = value as 'detailed' | 'simple';
+    onModeChange(newMode);
+    onRefresh(newMode);
+  };
 
   return (
     <div className="card" style={{ padding: 16, background: '#15202b' }}>
       <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 10 }}>
-        <Typography.Title level={5} style={{ margin: 0, color: '#e6ecf0', fontSize: 14 }}>
-          爬取日志
-        </Typography.Title>
         <Space size="small">
-          <Button size="small" icon={<ReloadOutlined />} onClick={onRefresh}>
+          <Typography.Title level={5} style={{ margin: 0, color: '#e6ecf0', fontSize: 14 }}>
+            爬取日志
+          </Typography.Title>
+          <Segmented
+            options={[
+              { label: '详细', value: 'detailed' },
+              { label: '简略', value: 'simple' },
+            ]}
+            value={mode}
+            onChange={handleModeChange}
+            size="small"
+          />
+        </Space>
+        <Space size="small">
+          <Button size="small" icon={<ReloadOutlined />} onClick={() => onRefresh(mode)}>
             刷新
           </Button>
           <Button size="small" icon={<ClearOutlined />} danger onClick={onClear}>
@@ -49,8 +68,13 @@ export default function LogConsole({ logs, onRefresh, onClear }: Props) {
         {logs.map((log) => {
           const time = new Date(log.timestamp).toLocaleTimeString('zh-CN', { hour12: false });
           const color = levelColor[log.level] ?? '#8899a6';
+          const isCritical = log.level === 'ERROR' && log.message.includes('🚨 CRITICAL');
           return (
-            <p key={`${log.timestamp}-${log.message}`} className="log-message">
+            <p
+              key={`${log.timestamp}-${log.message}`}
+              className="log-message"
+              style={isCritical ? { backgroundColor: '#4a1515', padding: '4px 8px', margin: '2px 0' } : undefined}
+            >
               <span style={{ color: '#8899a6', marginRight: 8 }}>[{time}]</span>
               <span style={{ color, marginRight: 8 }}>{log.level}</span>
               <span>{log.message}</span>
