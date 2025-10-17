@@ -9,14 +9,15 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
+from ...auth import get_current_user
 from ...db import get_db
-from ...models import ValuableProject
+from ...models import User, ValuableProject
 from ...schemas import (
-    PaginatedProjects,
-    ProjectItem,
-    DeleteProjectsRequest,
     DeleteByRegionsResponse,
+    DeleteProjectsRequest,
+    PaginatedProjects,
     ProjectFull,
+    ProjectItem,
 )
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
@@ -30,6 +31,7 @@ def list_projects(
     page: int = Query(default=1, ge=1),
     size: int = Query(default=20, ge=1, le=200),
     db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
 ) -> PaginatedProjects:
     selected = regions or ([region] if region else [])
     query = select(ValuableProject)
@@ -65,6 +67,7 @@ def export_projects(
     region: str | None = Query(default=None),
     regions: List[str] = Query(default_factory=list),
     db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
 ) -> Response:
     import json as _json
 
@@ -192,7 +195,7 @@ def export_projects(
 
 
 @router.delete("", status_code=204)
-def delete_projects(payload: DeleteProjectsRequest, db: Session = Depends(get_db)) -> Response:
+def delete_projects(payload: DeleteProjectsRequest, db: Session = Depends(get_db), _: User = Depends(get_current_user)) -> Response:
     if not payload.projectuuids:
         raise HTTPException(status_code=400, detail="必须提供要删除的项目uuid 列表")
     stmt = delete(ValuableProject).where(ValuableProject.projectuuid.in_(payload.projectuuids))
@@ -202,7 +205,7 @@ def delete_projects(payload: DeleteProjectsRequest, db: Session = Depends(get_db
 
 
 @router.delete("/by-regions", response_model=DeleteByRegionsResponse)
-def delete_by_regions(regions: List[str] = Query(default_factory=list), db: Session = Depends(get_db)) -> DeleteByRegionsResponse:
+def delete_by_regions(regions: List[str] = Query(default_factory=list), db: Session = Depends(get_db), _: User = Depends(get_current_user)) -> DeleteByRegionsResponse:
     if not regions:
         raise HTTPException(status_code=400, detail="必须提供至少一个地区进行删除")
     stmt = delete(ValuableProject).where(ValuableProject.region_code.in_(regions))
@@ -213,7 +216,7 @@ def delete_by_regions(regions: List[str] = Query(default_factory=list), db: Sess
 
 
 @router.get("/{projectuuid}", response_model=ProjectFull)
-def get_project_full(projectuuid: str, db: Session = Depends(get_db)) -> ProjectFull:
+def get_project_full(projectuuid: str, db: Session = Depends(get_db), _: User = Depends(get_current_user)) -> ProjectFull:
     project = db.get(ValuableProject, projectuuid)
     if not project:
         raise HTTPException(status_code=404, detail="项目不存在")

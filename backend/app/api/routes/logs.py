@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import List
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from ...auth import get_current_user
+from ...models import User
 from ...schemas import LogEntry
 from ...services.logs import append_log, clear_logs, load_logs
 
@@ -21,7 +23,7 @@ def _should_show_in_simple_mode(log: LogEntry) -> bool:
 
 
 @router.get("", response_model=List[LogEntry])
-def get_logs(limit: int = 200, mode: str = Query("detailed", regex="^(detailed|simple)$")) -> List[LogEntry]:
+def get_logs(limit: int = 200, mode: str = Query("detailed", regex="^(detailed|simple)$"), _: User = Depends(get_current_user)) -> List[LogEntry]:
     logs = load_logs(limit=500 if mode == "simple" else limit)
     if mode == "simple":
         return [log for log in logs if _should_show_in_simple_mode(log)]
@@ -29,6 +31,6 @@ def get_logs(limit: int = 200, mode: str = Query("detailed", regex="^(detailed|s
 
 
 @router.delete("")
-def purge_logs() -> None:
+def purge_logs(_: User = Depends(get_current_user)) -> None:
     clear_logs()
     append_log("INFO", "日志已清空")

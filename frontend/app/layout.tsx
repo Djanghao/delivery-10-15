@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Providers from '../components/Providers';
 import SidebarLayout from '../components/SidebarLayout';
+import AuthGuard from '../components/AuthGuard';
+import { AuthProvider } from '../lib/auth';
 import './globals.css';
 import AntdRegistry from './antd-registry';
 
@@ -15,7 +17,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AntdRegistry>
           <Providers>
-            <SidebarLayout>{children}</SidebarLayout>
+            <AuthProvider>
+              <AuthGuard>
+                <SidebarLayout>{children}</SidebarLayout>
+              </AuthGuard>
+            </AuthProvider>
           </Providers>
         </AntdRegistry>
       </body>

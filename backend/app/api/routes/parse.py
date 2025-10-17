@@ -8,8 +8,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
+from ...auth import get_current_user
+from ...crawler.client import PublicAnnouncementClient
+from ...crawler.models import TARGET_ITEM_NAMES
 from ...db import get_db
-from ...models import ValuableProject
+from ...models import User, ValuableProject
 from ...schemas import (
     ParseCaptchaStartRequest,
     ParseCaptchaStartResponse,
@@ -20,24 +23,22 @@ from ...schemas import (
     ParseDownloadRequest,
     ParseDownloadResponse,
 )
-from ...crawler.client import PublicAnnouncementClient
 from ...services.parse_service import (
+    download_with_session,
     establish_session_and_get_captcha,
+    save_to_project_dir,
     session_manager,
     to_base64_image,
     verify_captcha,
-    download_with_session,
-    save_to_project_dir,
 )
 from ...services.pdf_extractor import extract_from_pdf
-from ...crawler.models import TARGET_ITEM_NAMES
 
 
 router = APIRouter(prefix="/api/parse", tags=["parse"])
 
 
 @router.get("/detail/{projectuuid}", response_model=ParseDetailResponse)
-def get_project_parse_detail(projectuuid: str) -> ParseDetailResponse:
+def get_project_parse_detail(projectuuid: str, _: User = Depends(get_current_user)) -> ParseDetailResponse:
     client = PublicAnnouncementClient()
     detail = client.get_project_detail(projectuuid)
     if not detail:
@@ -49,7 +50,7 @@ def get_project_parse_detail(projectuuid: str) -> ParseDetailResponse:
 
 
 @router.post("/captcha/start", response_model=ParseCaptchaStartResponse)
-def start_captcha(payload: ParseCaptchaStartRequest) -> ParseCaptchaStartResponse:
+def start_captcha(payload: ParseCaptchaStartRequest, _: User = Depends(get_current_user)) -> ParseCaptchaStartResponse:
     client = PublicAnnouncementClient()
     cookies, img_bytes = establish_session_and_get_captcha(client, payload.projectuuid, payload.sendid)
     s = session_manager.create(payload.projectuuid, payload.sendid, cookies)
@@ -57,7 +58,7 @@ def start_captcha(payload: ParseCaptchaStartRequest) -> ParseCaptchaStartRespons
 
 
 @router.post("/captcha/verify", response_model=ParseCaptchaVerifyResponse)
-def verify_captcha_code(payload: ParseCaptchaVerifyRequest) -> ParseCaptchaVerifyResponse:
+def verify_captcha_code(payload: ParseCaptchaVerifyRequest, _: User = Depends(get_current_user)) -> ParseCaptchaVerifyResponse:
     s = session_manager.get(payload.parse_session_id)
     if not s:
         raise HTTPException(status_code=404, detail="会话不存在或已过期")
@@ -73,7 +74,7 @@ def verify_captcha_code(payload: ParseCaptchaVerifyRequest) -> ParseCaptchaVerif
 
 
 @router.post("/download", response_model=ParseDownloadResponse)
-def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(get_db)) -> ParseDownloadResponse:
+def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(get_db), _: User = Depends(get_current_user)) -> ParseDownloadResponse:
     s = session_manager.get(payload.parse_session_id)
     if not s:
         raise HTTPException(status_code=404, detail="会话不存在或已过期")
@@ -129,7 +130,7 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
 
 
 @router.post("/download-file")
-def download_file_to_client(payload: ParseDownloadRequest) -> Response:
+def download_file_to_client(payload: ParseDownloadRequest, _: User = Depends(get_current_user)) -> Response:
     """
     Directly stream the file bytes to client for download.
     Requires a verified captcha session.

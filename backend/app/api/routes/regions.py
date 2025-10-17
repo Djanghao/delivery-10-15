@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import List, Optional
-
-from fastapi import APIRouter, HTTPException
-
-from ...schemas import RegionNode
-from ...services.crawler_service import CrawlerService
-from ...config import DATA_DIR
 import json
 from pathlib import Path
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException
+
+from ...auth import get_current_user
+from ...config import DATA_DIR
+from ...models import User
+from ...schemas import RegionNode
+from ...services.crawler_service import CrawlerService
 
 router = APIRouter(prefix="/api/regions", tags=["regions"])
 service = CrawlerService()
@@ -37,7 +39,7 @@ def _save_regions_cache(regions: List[RegionNode]) -> None:
 
 
 @router.get("", response_model=List[RegionNode])
-def get_regions() -> List[RegionNode]:
+def get_regions(_: User = Depends(get_current_user)) -> List[RegionNode]:
     # 先尝试读取缓存，若无则实时抓取并落盘
     cached = _load_cached_regions()
     if cached is not None:
@@ -55,7 +57,7 @@ def get_regions() -> List[RegionNode]:
 
 
 @router.post("/refresh", response_model=List[RegionNode])
-def refresh_regions() -> List[RegionNode]:
+def refresh_regions(_: User = Depends(get_current_user)) -> List[RegionNode]:
     # 强制刷新：调用现有爬取逻辑并更新缓存
     try:
         regions = service.fetch_region_tree()

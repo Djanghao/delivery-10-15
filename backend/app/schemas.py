@@ -138,3 +138,40 @@ class ParseDownloadResponse(BaseModel):
     ok: bool
     saved_path: str | None = None
     parsed_fields: dict | None = None
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    username: str
+    role: str
+
+
+class UserInfo(BaseModel):
+    id: int
+    username: str
+    role: str
+    is_active: bool
+    created_at: datetime
+
+
+class CreateUserRequest(BaseModel):
+    username: str
+    password: str
+    role: Literal["admin", "user"] = "user"
+
+
+class UpdateUserRequest(BaseModel):
+    is_active: bool
+
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
