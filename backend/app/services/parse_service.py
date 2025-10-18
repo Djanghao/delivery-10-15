@@ -4,9 +4,9 @@ import base64
 import os
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -33,6 +33,7 @@ class ParseSession:
     created_at: float
     updated_at: float
     verified_captcha_code: Optional[str] = None
+    downloaded_files: List[str] = field(default_factory=list)
 
 
 class ParseSessionManager:
@@ -60,6 +61,7 @@ class ParseSessionManager:
         return session
 
     def get(self, sid: str) -> Optional[ParseSession]:
+        self.cleanup()
         s = self._sessions.get(sid)
         if s:
             s.updated_at = time.time()
@@ -69,6 +71,14 @@ class ParseSessionManager:
         now = time.time()
         expired = [sid for sid, s in self._sessions.items() if now - s.updated_at > ttl_sec]
         for sid in expired:
+            s = self._sessions.get(sid)
+            if s:
+                for filepath in s.downloaded_files:
+                    try:
+                        if os.path.exists(filepath):
+                            os.remove(filepath)
+                    except Exception:
+                        pass
             self._sessions.pop(sid, None)
 
 

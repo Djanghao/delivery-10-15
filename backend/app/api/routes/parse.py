@@ -95,14 +95,13 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
     filename = f"{s.id}_{base_filename}"
 
     saved_path = save_to_project_dir(s.projectuuid, filename, content)
+    s.downloaded_files.append(saved_path)
 
     extracted_fields = None
-    # If not download-only and file is a PDF, try to parse
     if not payload.download_only and filename.lower().endswith(".pdf"):
         try:
             extracted_fields = extract_from_pdf(saved_path)
         except Exception:
-            # PDF 无法解析则略过提取，仍返回保存路径
             extracted_fields = None
 
     project = db.get(ValuableProject, payload.projectuuid)
@@ -112,17 +111,16 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
         project.pdf_extract_json = __import__("json").dumps(extracted_fields, ensure_ascii=False)
         project.parsed_pdf = True
         project.parsed_at = datetime.utcnow()
-        # 删除临时PDF文件以节省空间
-        try:
-            if os.path.exists(saved_path):
-                os.remove(saved_path)
-        except Exception:
-            pass
         project.pdf_file_path = None
         db.add(project)
         db.commit()
+        try:
+            if os.path.exists(saved_path):
+                os.remove(saved_path)
+                s.downloaded_files.remove(saved_path)
+        except Exception:
+            pass
     else:
-        # 仅保存文件路径（download_only 或非PDF或解析失败）
         project.pdf_file_path = saved_path
         db.add(project)
         db.commit()
