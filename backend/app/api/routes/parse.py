@@ -87,11 +87,12 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
     client = PublicAnnouncementClient()
     content = download_with_session(client, s.cookies, s.referer, sendid, payload.flag, s.verified_captcha_code)
 
-    # Extract filename from url if provided, otherwise use sendid
     if payload.url:
-        filename = os.path.basename(payload.url)
+        base_filename = os.path.basename(payload.url)
     else:
-        filename = f"{sendid}.pdf"
+        base_filename = f"{sendid}.pdf"
+
+    filename = f"{s.id}_{base_filename}"
 
     saved_path = save_to_project_dir(s.projectuuid, filename, content)
 
