@@ -1,6 +1,6 @@
 'use client';
 
-import { App, Badge, Button, Card, Col, Flex, Image, Input, Modal, Row, Space, Spin, Table, Tabs, Tag, Typography } from 'antd';
+import { App, Badge, Button, Card, Col, Flex, Image, Input, Modal, Row, Select, Space, Spin, Table, Tabs, Tag, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { FilterOutlined, PlayCircleOutlined, StopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -63,6 +63,8 @@ export default function ExtractPage() {
   const [currentItemName, setCurrentItemName] = useState<string>('');
   const [batchTotalCount, setBatchTotalCount] = useState(0);
   const [batchCurrentIndex, setBatchCurrentIndex] = useState(0);
+  const [excludeKeywords, setExcludeKeywords] = useState<string[]>(['分布式光伏']);
+  const [skippedProjectName, setSkippedProjectName] = useState<string>('');
   const activeSessionRef = useRef<ParseSession | null>(null);
   const activeContextRef = useRef<{ project: ProjectItem; item: ParseDetailItem } | null>(null);
   const stopRequestedRef = useRef(false);
@@ -280,10 +282,12 @@ export default function ExtractPage() {
 
       setBatchTotalCount(totalUnparsed);
       setBatchCurrentIndex(0);
+      setSkippedProjectName('');
 
       const pageSize = 100;
       const totalPages = Math.ceil(totalUnparsed / pageSize);
       let processedCount = 0;
+      let skippedCount = 0;
 
       for (let page = 1; page <= totalPages; page++) {
         if (stopRequestedRef.current) break;
@@ -298,6 +302,17 @@ export default function ExtractPage() {
 
         for (const p of payload.items) {
           if (stopRequestedRef.current) break;
+
+          const shouldSkip = excludeKeywords.some((keyword) => p.project_name.includes(keyword));
+          if (shouldSkip) {
+            setSkippedProjectName(p.project_name);
+            setBatchCurrentIndex(processedCount + 1);
+            processedCount++;
+            skippedCount++;
+            continue;
+          }
+
+          setSkippedProjectName('');
           setBatchCurrentIndex(processedCount + 1);
           await parseSingleProject(p);
           processedCount++;
@@ -305,13 +320,15 @@ export default function ExtractPage() {
       }
 
       await Promise.all([loadProjects(pagination.current ?? 1, pagination.pageSize ?? 20), loadCounts()]);
-      message.success(`批量解析完成，共处理 ${processedCount} 个项目`);
+      const skippedMsg = skippedCount > 0 ? `，共跳过 ${skippedCount} 个项目` : '';
+      message.success(`批量解析完成，共处理 ${processedCount} 个项目${skippedMsg}`);
     } catch (err) {
       message.error((err as Error).message || '批量解析失败');
     } finally {
       setCaptchaVisible(false);
       setBatchTotalCount(0);
       setBatchCurrentIndex(0);
+      setSkippedProjectName('');
     }
   }
 
@@ -378,9 +395,23 @@ export default function ExtractPage() {
           <Col xs={24} md={12} lg={14}>
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
               <Typography.Paragraph>
-                选择需要提取的地区后，点击“按地区筛选”加载命中项目列表，然后点击“开始解析 PDF”按项目顺序下载并提取。
+                选择需要提取的地区后，点击"按地区筛选"加载命中项目列表，然后点击"开始解析 PDF"按项目顺序下载并提取。
                 每次需要输入验证码时会弹出窗口，请按图输入后继续。
               </Typography.Paragraph>
+              <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                <Typography.Text style={{ fontSize: 12 }}>过滤项目名称</Typography.Text>
+                <Select
+                  mode="tags"
+                  placeholder="选择或输入要排除的关键词"
+                  value={excludeKeywords}
+                  onChange={setExcludeKeywords}
+                  size="small"
+                  style={{ width: '100%' }}
+                  options={[
+                    { value: '分布式光伏', label: '分布式光伏' },
+                  ]}
+                />
+              </Space>
               <Space wrap>
                 <Button type="primary" icon={<FilterOutlined />} size="large" onClick={handleFilter}>
                   按地区筛选
@@ -448,19 +479,33 @@ export default function ExtractPage() {
         maskClosable={false}
       >
         <Space direction="vertical" style={{ width: '100%' }} size={16}>
-          <Card size="small" style={{ background: '#f5f5f5' }}>
-            <Space direction="vertical" size={4} style={{ width: '100%' }}>
-              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                正在解析项目
-              </Typography.Text>
-              <Typography.Text strong style={{ fontSize: 14 }}>
-                {currentProjectName}
-              </Typography.Text>
-              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                文件类型：{currentItemName}
-              </Typography.Text>
-            </Space>
-          </Card>
+          {skippedProjectName && (
+            <Card size="small" style={{ background: '#fff7e6', borderColor: '#ffa940' }}>
+              <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                <Typography.Text type="warning" style={{ fontSize: 12 }}>
+                  已跳过项目
+                </Typography.Text>
+                <Typography.Text strong style={{ fontSize: 14, color: '#fa8c16' }}>
+                  {skippedProjectName}
+                </Typography.Text>
+              </Space>
+            </Card>
+          )}
+          {!skippedProjectName && (
+            <Card size="small" style={{ background: '#f5f5f5' }}>
+              <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  正在解析项目
+                </Typography.Text>
+                <Typography.Text strong style={{ fontSize: 14 }}>
+                  {currentProjectName}
+                </Typography.Text>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  文件类型：{currentItemName}
+                </Typography.Text>
+              </Space>
+            </Card>
+          )}
 
           <div>
             <Typography.Text strong style={{ marginBottom: 8, display: 'block' }}>
