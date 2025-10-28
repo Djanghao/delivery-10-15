@@ -115,17 +115,18 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
         project.is_invalid = False
         db.add(project)
         db.commit()
-        try:
-            if os.path.exists(saved_path):
-                os.remove(saved_path)
-                s.downloaded_files.remove(saved_path)
-        except Exception:
-            pass
     else:
-        project.pdf_file_path = saved_path
+        project.pdf_file_path = None
         project.is_invalid = True
         db.add(project)
         db.commit()
+
+    try:
+        if os.path.exists(saved_path):
+            os.remove(saved_path)
+            s.downloaded_files.remove(saved_path)
+    except Exception:
+        pass
 
     return ParseDownloadResponse(ok=True, saved_path=saved_path, parsed_fields=extracted_fields)
 
