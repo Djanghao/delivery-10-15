@@ -14,7 +14,6 @@ def ensure_migrations(session: Session) -> None:
 
     Adds new columns introduced after initial table creation without requiring Alembic.
     """
-    # valuable_projects: parsed_pdf, parsed_at, pdf_extract_json, pdf_file_path
     alters: list[tuple[str, str]] = []
     if not _column_exists(session, "valuable_projects", "parsed_pdf"):
         alters.append(("valuable_projects", "ALTER TABLE valuable_projects ADD COLUMN parsed_pdf INTEGER NOT NULL DEFAULT 0"))
@@ -24,6 +23,8 @@ def ensure_migrations(session: Session) -> None:
         alters.append(("valuable_projects", "ALTER TABLE valuable_projects ADD COLUMN pdf_extract_json TEXT NULL"))
     if not _column_exists(session, "valuable_projects", "pdf_file_path"):
         alters.append(("valuable_projects", "ALTER TABLE valuable_projects ADD COLUMN pdf_file_path TEXT NULL"))
+    if not _column_exists(session, "valuable_projects", "is_invalid"):
+        alters.append(("valuable_projects", "ALTER TABLE valuable_projects ADD COLUMN is_invalid INTEGER NOT NULL DEFAULT 0"))
 
     for _, sql in alters:
         session.execute(text(sql))

@@ -46,6 +46,7 @@ class ProjectItem(BaseModel):
     region_code: str
     discovered_at: datetime
     parsed_pdf: bool | None = None
+    is_invalid: bool | None = None
 
 
 class PaginatedProjects(BaseModel):
@@ -59,6 +60,7 @@ class ProjectCounts(BaseModel):
     all: int
     parsed: int
     unparsed: int
+    invalid: int
 
 
 class CrawlRunItem(BaseModel):
@@ -96,6 +98,7 @@ class ProjectFull(BaseModel):
     parsed_at: datetime | None = None
     pdf_extract: dict | None = None
     pdf_file_path: str | None = None
+    is_invalid: bool = False
 
 
 # Parse endpoints

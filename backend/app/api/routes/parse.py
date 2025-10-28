@@ -112,6 +112,7 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
         project.parsed_pdf = True
         project.parsed_at = datetime.utcnow()
         project.pdf_file_path = None
+        project.is_invalid = False
         db.add(project)
         db.commit()
         try:
@@ -122,6 +123,7 @@ def download_and_extract(payload: ParseDownloadRequest, db: Session = Depends(ge
             pass
     else:
         project.pdf_file_path = saved_path
+        project.is_invalid = True
         db.add(project)
         db.commit()
 

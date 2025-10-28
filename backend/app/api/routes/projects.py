@@ -38,12 +38,14 @@ def get_project_counts(
 
     all_count = int(db.scalar(base_query) or 0)
     parsed_count = int(db.scalar(base_query.where(ValuableProject.parsed_pdf == True)) or 0)
-    unparsed_count = int(db.scalar(base_query.where(ValuableProject.parsed_pdf == False)) or 0)
+    unparsed_count = int(db.scalar(base_query.where(ValuableProject.parsed_pdf == False).where(ValuableProject.is_invalid == False)) or 0)
+    invalid_count = int(db.scalar(base_query.where(ValuableProject.is_invalid == True)) or 0)
 
     return ProjectCounts(
         all=all_count,
         parsed=parsed_count,
         unparsed=unparsed_count,
+        invalid=invalid_count,
     )
 
 
@@ -52,6 +54,7 @@ def list_projects(
     region: str | None = Query(default=None),
     regions: List[str] = Query(default_factory=list),
     parsed: bool | None = Query(default=None),
+    invalid: bool | None = Query(default=None),
     page: int = Query(default=1, ge=1),
     size: int = Query(default=20, ge=1, le=200),
     db: Session = Depends(get_db),
@@ -63,9 +66,15 @@ def list_projects(
     if selected:
         query = query.where(ValuableProject.region_code.in_(selected))
         count_query = count_query.where(ValuableProject.region_code.in_(selected))
-    if parsed is not None:
+    if invalid is not None:
+        query = query.where(ValuableProject.is_invalid == invalid)
+        count_query = count_query.where(ValuableProject.is_invalid == invalid)
+    elif parsed is not None:
         query = query.where(ValuableProject.parsed_pdf == parsed)
         count_query = count_query.where(ValuableProject.parsed_pdf == parsed)
+        if parsed is False:
+            query = query.where(ValuableProject.is_invalid == False)
+            count_query = count_query.where(ValuableProject.is_invalid == False)
     query = query.order_by(ValuableProject.discovered_at.desc()).offset((page - 1) * size).limit(size)
     items = db.scalars(query).all()
     total = int(db.scalar(count_query) or 0)
@@ -77,6 +86,7 @@ def list_projects(
                 region_code=item.region_code,
                 discovered_at=item.discovered_at,
                 parsed_pdf=item.parsed_pdf,
+                is_invalid=item.is_invalid,
             )
             for item in items
         ],

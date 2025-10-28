@@ -17,11 +17,11 @@ class ValuableProject(Base):
     project_name = Column(String(255), nullable=False)
     region_code = Column(String(20), nullable=False)
     discovered_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    # PDF 解析状态及结果
     parsed_pdf = Column(Boolean, default=False, nullable=False)
     parsed_at = Column(DateTime, nullable=True)
     pdf_extract_json = Column(Text, nullable=True)
     pdf_file_path = Column(Text, nullable=True)
+    is_invalid = Column(Boolean, default=False, nullable=False)
 
 
 class CrawlProgress(Base):

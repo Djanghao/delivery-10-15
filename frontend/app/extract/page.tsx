@@ -15,6 +15,7 @@ interface ProjectItem {
   region_code: string;
   discovered_at: string;
   parsed_pdf?: boolean;
+  is_invalid?: boolean;
 }
 
 interface PaginatedProjects {
@@ -28,6 +29,7 @@ interface ProjectCounts {
   all: number;
   parsed: number;
   unparsed: number;
+  invalid: number;
 }
 
 interface ParseDetailItem {
@@ -49,8 +51,8 @@ export default function ExtractPage() {
   const [loading, setLoading] = useState(false);
   const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
   const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
-  const [parsedFilter, setParsedFilter] = useState<'all' | 'parsed' | 'unparsed'>('all');
-  const [counts, setCounts] = useState<ProjectCounts>({ all: 0, parsed: 0, unparsed: 0 });
+  const [parsedFilter, setParsedFilter] = useState<'all' | 'parsed' | 'unparsed' | 'invalid'>('all');
+  const [counts, setCounts] = useState<ProjectCounts>({ all: 0, parsed: 0, unparsed: 0, invalid: 0 });
 
   const [captchaVisible, setCaptchaVisible] = useState(false);
   const [captchaImage, setCaptchaImage] = useState<string>('');
@@ -59,6 +61,8 @@ export default function ExtractPage() {
   const [captchaLoading, setCaptchaLoading] = useState(false);
   const [currentProjectName, setCurrentProjectName] = useState<string>('');
   const [currentItemName, setCurrentItemName] = useState<string>('');
+  const [batchTotalCount, setBatchTotalCount] = useState(0);
+  const [batchCurrentIndex, setBatchCurrentIndex] = useState(0);
   const activeSessionRef = useRef<ParseSession | null>(null);
   const activeContextRef = useRef<{ project: ProjectItem; item: ParseDetailItem } | null>(null);
   const stopRequestedRef = useRef(false);
@@ -111,7 +115,7 @@ export default function ExtractPage() {
       const payload = await apiFetch<ProjectCounts>(`/api/projects/counts?${params.toString()}`);
       setCounts(payload);
     } catch {
-      setCounts({ all: 0, parsed: 0, unparsed: 0 });
+      setCounts({ all: 0, parsed: 0, unparsed: 0, invalid: 0 });
     }
   }, [selectedRegions]);
 
@@ -119,7 +123,7 @@ export default function ExtractPage() {
     async (
       page = pagination.current ?? 1,
       pageSize = pagination.pageSize ?? 20,
-      parsedKey: 'all' | 'parsed' | 'unparsed' = parsedFilter,
+      parsedKey: 'all' | 'parsed' | 'unparsed' | 'invalid' = parsedFilter,
     ) => {
       setLoading(true);
       try {
@@ -131,6 +135,8 @@ export default function ExtractPage() {
           params.set('parsed', 'true');
         } else if (parsedKey === 'unparsed') {
           params.set('parsed', 'false');
+        } else if (parsedKey === 'invalid') {
+          params.set('invalid', 'true');
         }
         const payload = await apiFetch<PaginatedProjects>(`/api/projects?${params.toString()}`);
         setProjects(payload.items);
@@ -155,7 +161,7 @@ export default function ExtractPage() {
   };
 
   const handleTabChange = async (key: string) => {
-    const next = key as 'all' | 'parsed' | 'unparsed';
+    const next = key as 'all' | 'parsed' | 'unparsed' | 'invalid';
     setParsedFilter(next);
     await loadProjects(1, pagination.pageSize ?? 20, next);
   };
@@ -177,7 +183,10 @@ export default function ExtractPage() {
       title: '状态',
       dataIndex: 'parsed_pdf',
       key: 'parsed_pdf',
-      render: (val?: boolean) => (val ? <Tag color="green">已解析PDF</Tag> : <Tag>未解析</Tag>),
+      render: (val?: boolean, record?: ProjectItem) => {
+        if (record?.is_invalid) return <Tag color="red">无效</Tag>;
+        return val ? <Tag color="green">已解析PDF</Tag> : <Tag>未解析</Tag>;
+      },
     },
     {
       title: '解析',
@@ -257,13 +266,52 @@ export default function ExtractPage() {
       return;
     }
     stopRequestedRef.current = false;
+
     try {
-      for (const p of projects) {
-        if (stopRequestedRef.current) break;
-        await parseSingleProject(p);
+      const params = new URLSearchParams();
+      selectedRegions.forEach((region) => params.append('regions', region));
+      const countsData = await apiFetch<ProjectCounts>(`/api/projects/counts?${params.toString()}`);
+
+      const totalUnparsed = countsData.unparsed;
+      if (totalUnparsed === 0) {
+        message.info('没有需要解析的项目');
+        return;
       }
+
+      setBatchTotalCount(totalUnparsed);
+      setBatchCurrentIndex(0);
+
+      const pageSize = 100;
+      const totalPages = Math.ceil(totalUnparsed / pageSize);
+      let processedCount = 0;
+
+      for (let page = 1; page <= totalPages; page++) {
+        if (stopRequestedRef.current) break;
+
+        const fetchParams = new URLSearchParams();
+        selectedRegions.forEach((region) => fetchParams.append('regions', region));
+        fetchParams.set('page', String(page));
+        fetchParams.set('size', String(pageSize));
+        fetchParams.set('parsed', 'false');
+
+        const payload = await apiFetch<PaginatedProjects>(`/api/projects?${fetchParams.toString()}`);
+
+        for (const p of payload.items) {
+          if (stopRequestedRef.current) break;
+          setBatchCurrentIndex(processedCount + 1);
+          await parseSingleProject(p);
+          processedCount++;
+        }
+      }
+
+      await Promise.all([loadProjects(pagination.current ?? 1, pagination.pageSize ?? 20), loadCounts()]);
+      message.success(`批量解析完成，共处理 ${processedCount} 个项目`);
+    } catch (err) {
+      message.error((err as Error).message || '批量解析失败');
     } finally {
       setCaptchaVisible(false);
+      setBatchTotalCount(0);
+      setBatchCurrentIndex(0);
     }
   }
 
@@ -290,12 +338,13 @@ export default function ExtractPage() {
       if (!verify.ok) {
         setCaptchaImage(verify.captcha_image_base64 || '');
         setCaptchaCode('');
-        message.error('验证码错误，请重试');
         setCaptchaSubmitting(false);
+        setCaptchaLoading(false);
+        message.error('验证码错误，请重试');
         setTimeout(() => {
-          setCaptchaLoading(false);
           captchaInputRef.current?.focus();
-        }, 100);
+          captchaInputRef.current?.select();
+        }, 150);
         return;
       }
       await apiFetch(`/api/parse/download`, {
@@ -359,6 +408,7 @@ export default function ExtractPage() {
             { key: 'all', label: `全部 (${counts.all}个)` },
             { key: 'parsed', label: `已解析 (${counts.parsed}个)` },
             { key: 'unparsed', label: `未解析 (${counts.unparsed}个)` },
+            { key: 'invalid', label: `无效 (${counts.invalid}个)` },
           ]}
           style={{ marginBottom: 16 }}
         />
@@ -377,6 +427,11 @@ export default function ExtractPage() {
           <Space>
             <Badge status="processing" />
             <span>PDF 解析进行中</span>
+            {batchTotalCount > 0 && (
+              <Tag color="blue">
+                {batchCurrentIndex}/{batchTotalCount}
+              </Tag>
+            )}
           </Space>
         }
         open={captchaVisible}
