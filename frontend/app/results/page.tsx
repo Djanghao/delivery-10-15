@@ -76,7 +76,7 @@ export default function ResultsPage() {
       mounted = false;
       window.removeEventListener('regions-refreshed', onRefreshed);
     };
-  }, [flattenRegions]);
+  }, []);
 
   const selectedRegionNames = useMemo(() => {
     const filtered = selectedRegions.filter((id) => !rootRegionIds.has(id));
