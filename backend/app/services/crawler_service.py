@@ -305,7 +305,7 @@ class CrawlerService:
                 should_skip = False
                 for keyword in exclude_keywords:
                     if keyword in project_name:
-                        append_log("INFO", f"跳过项目: {project_name} (匹配过滤: {keyword})")
+                        append_log("INFO", f"🚫 过滤项目: {project_name} (匹配关键词: {keyword})")
                         self._update_progress(session, region_code, item.sendid)
                         should_skip = True
                         break

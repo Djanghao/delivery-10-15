@@ -1,6 +1,6 @@
 'use client';
 
-import { App, Alert, Button, Card, Col, Flex, Input, Row, Space, Statistic, Typography } from 'antd';
+import { App, Alert, Button, Card, Col, Flex, Row, Select, Space, Statistic, Typography } from 'antd';
 import { HistoryOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../components/RegionTree';
@@ -21,7 +21,7 @@ export default function CrawlDashboard() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [statuses, setStatuses] = useState<TaskStatus[]>([]);
   const [logMode, setLogMode] = useState<'detailed' | 'simple'>('detailed');
-  const [excludeKeywords, setExcludeKeywords] = useState('分布式光伏');
+  const [excludeKeywords, setExcludeKeywords] = useState<string[]>(['分布式光伏']);
 
   const refreshLogs = useCallback(async (mode?: 'detailed' | 'simple') => {
     const actualMode = mode ?? logMode;
@@ -69,7 +69,7 @@ export default function CrawlDashboard() {
     try {
       await apiFetch(`/api/crawl/start`, {
         method: 'POST',
-        body: JSON.stringify({ mode, regions: selectedRegions, exclude_keywords: excludeKeywords }),
+        body: JSON.stringify({ mode, regions: selectedRegions, exclude_keywords: excludeKeywords.join(',') }),
       });
       message.success('任务已进入队列');
       refreshStatuses();
@@ -98,11 +98,16 @@ export default function CrawlDashboard() {
                 <Typography.Title level={5} style={{ margin: 0, fontSize: 14 }}>任务控制</Typography.Title>
                 <Space direction="vertical" size={8} style={{ width: '100%' }}>
                   <Typography.Text style={{ fontSize: 12 }}>过滤项目名称</Typography.Text>
-                  <Input
-                    placeholder="输入要排除的关键词，多个关键词用逗号分隔"
+                  <Select
+                    mode="tags"
+                    placeholder="选择或输入要排除的关键词"
                     value={excludeKeywords}
-                    onChange={(e) => setExcludeKeywords(e.target.value)}
+                    onChange={setExcludeKeywords}
                     size="small"
+                    style={{ width: '100%' }}
+                    options={[
+                      { value: '分布式光伏', label: '分布式光伏' },
+                    ]}
                   />
                 </Space>
                 <Row gutter={12}>
