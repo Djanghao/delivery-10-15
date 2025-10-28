@@ -1,6 +1,6 @@
 'use client';
 
-import { App, Alert, Button, Card, Col, Flex, Row, Space, Statistic, Typography } from 'antd';
+import { App, Alert, Button, Card, Col, Flex, Input, Row, Space, Statistic, Typography } from 'antd';
 import { HistoryOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RegionTree from '../components/RegionTree';
@@ -21,6 +21,7 @@ export default function CrawlDashboard() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [statuses, setStatuses] = useState<TaskStatus[]>([]);
   const [logMode, setLogMode] = useState<'detailed' | 'simple'>('detailed');
+  const [excludeKeywords, setExcludeKeywords] = useState('分布式光伏');
 
   const refreshLogs = useCallback(async (mode?: 'detailed' | 'simple') => {
     const actualMode = mode ?? logMode;
@@ -68,7 +69,7 @@ export default function CrawlDashboard() {
     try {
       await apiFetch(`/api/crawl/start`, {
         method: 'POST',
-        body: JSON.stringify({ mode, regions: selectedRegions }),
+        body: JSON.stringify({ mode, regions: selectedRegions, exclude_keywords: excludeKeywords }),
       });
       message.success('任务已进入队列');
       refreshStatuses();
@@ -95,6 +96,15 @@ export default function CrawlDashboard() {
             <Flex vertical justify="space-between" style={{ width: '100%' }}>
               <Space direction="vertical" size={12} style={{ width: '100%' }}>
                 <Typography.Title level={5} style={{ margin: 0, fontSize: 14 }}>任务控制</Typography.Title>
+                <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                  <Typography.Text style={{ fontSize: 12 }}>过滤项目名称</Typography.Text>
+                  <Input
+                    placeholder="输入要排除的关键词，多个关键词用逗号分隔"
+                    value={excludeKeywords}
+                    onChange={(e) => setExcludeKeywords(e.target.value)}
+                    size="small"
+                  />
+                </Space>
                 <Row gutter={12}>
                   <Col span={12}>
                     <Button

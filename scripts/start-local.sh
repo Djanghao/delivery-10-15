@@ -7,11 +7,11 @@ cd "$(dirname "$0")/.."
 
 echo "Starting Gov Stats Crawler Platform (Local Dev Mode)..."
 
-if [ ! -d "backend/venv" ]; then
+if [ ! -d "backend/.venv" ]; then
     echo "Setting up Python virtual environment..."
     cd backend
-    python3 -m venv venv
-    source venv/bin/activate
+    python3 -m venv .venv
+    source .venv/bin/activate
     pip install -r requirements.txt
     deactivate || true
     cd ..
@@ -31,7 +31,7 @@ fi
 echo ""
 echo "Starting backend on port 8010..."
 cd backend
-./venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8010 --reload &
+./.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8010 --reload &
 BACKEND_PID=$!
 cd ..
 

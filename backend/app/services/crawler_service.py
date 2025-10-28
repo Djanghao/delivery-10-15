@@ -90,6 +90,7 @@ class CrawlerService:
         *,
         run_id: Optional[str] = None,
         should_stop: Optional[Callable[[], bool]] = None,
+        exclude_keywords: str = "",
     ) -> CrawlRun:
         run_id = run_id or str(uuid.uuid4())
         crawl_run = CrawlRun(
@@ -106,15 +107,18 @@ class CrawlerService:
         region_names = [region_name_map.get(code, code) for code in region_codes]
         append_log("INFO", f"任务 {run_id} 开始，模式 {mode}，地区 {','.join(region_names)}")
         stats = CrawlStats()
+        keywords_list = [kw.strip() for kw in exclude_keywords.split(",") if kw.strip()] if exclude_keywords else []
+        if keywords_list:
+            append_log("INFO", f"任务 {run_id} 过滤关键词: {', '.join(keywords_list)}")
         try:
             for region_code in region_codes:
                 if should_stop and should_stop():
                     append_log("INFO", f"任务 {run_id} 已请求终止，停止后续处理")
                     break
                 if mode == "history":
-                    self._run_history_for_region(session, region_code, stats, region_name_map, should_stop=should_stop)
+                    self._run_history_for_region(session, region_code, stats, region_name_map, should_stop=should_stop, exclude_keywords=keywords_list)
                 else:
-                    self._run_incremental_for_region(session, region_code, stats, region_name_map, should_stop=should_stop)
+                    self._run_incremental_for_region(session, region_code, stats, region_name_map, should_stop=should_stop, exclude_keywords=keywords_list)
             crawl_run.total_items = stats.total_items
             crawl_run.valuable_projects = stats.valuable_projects
             crawl_run.finished_at = datetime.utcnow()
@@ -139,6 +143,7 @@ class CrawlerService:
         region_name_map: Dict[str, str],
         *,
         should_stop: Optional[Callable[[], bool]] = None,
+        exclude_keywords: Optional[List[str]] = None,
     ) -> None:
         region_name = region_name_map.get(region_code, region_code)
         append_log("INFO", f"地区 {region_name} 历史爬取开始")
@@ -158,7 +163,7 @@ class CrawlerService:
             before_total = stats.total_items
             before_matched = stats.matched_projects
             before_saved = stats.valuable_projects
-            self._process_items(session, region_code, reversed(current_page.items), stats, region_name_map, should_stop=should_stop)
+            self._process_items(session, region_code, reversed(current_page.items), stats, region_name_map, should_stop=should_stop, exclude_keywords=exclude_keywords)
             page_items = len(current_page.items)
             delta_total = stats.total_items - before_total
             delta_matched = stats.matched_projects - before_matched
@@ -189,13 +194,14 @@ class CrawlerService:
         region_name_map: Dict[str, str],
         *,
         should_stop: Optional[Callable[[], bool]] = None,
+        exclude_keywords: Optional[List[str]] = None,
     ) -> None:
         region_name = region_name_map.get(region_code, region_code)
         append_log("INFO", f"地区 {region_name} 增量爬取开始")
         progress = session.get(CrawlProgress, region_code)
         if not progress or not progress.last_pivot_sendid:
             append_log("INFO", f"地区 {region_name} 无历史 pivot，执行全量补齐")
-            self._run_history_for_region(session, region_code, stats, region_name_map, should_stop=should_stop)
+            self._run_history_for_region(session, region_code, stats, region_name_map, should_stop=should_stop, exclude_keywords=exclude_keywords)
             return
         pivot = progress.last_pivot_sendid
         new_items = self._collect_items_after_pivot(region_code, pivot, region_name_map)
@@ -205,7 +211,7 @@ class CrawlerService:
         before_matched = stats.matched_projects
         before_saved = stats.valuable_projects
         before_total = stats.total_items
-        self._process_items(session, region_code, new_items, stats, region_name_map, should_stop=should_stop)
+        self._process_items(session, region_code, new_items, stats, region_name_map, should_stop=should_stop, exclude_keywords=exclude_keywords)
         delta_total = stats.total_items - before_total
         delta_matched = stats.matched_projects - before_matched
         delta_saved = stats.valuable_projects - before_saved
@@ -252,6 +258,7 @@ class CrawlerService:
         region_name_map: Dict[str, str],
         *,
         should_stop: Optional[Callable[[], bool]] = None,
+        exclude_keywords: Optional[List[str]] = None,
     ) -> None:
         region_name = region_name_map.get(region_code, region_code)
         empty_items_count = 0
@@ -292,6 +299,18 @@ class CrawlerService:
                 append_log("WARNING", f"项目 {item.projectuuid} 无详情，忽略")
                 self._update_progress(session, region_code, item.sendid)
                 continue
+
+            if exclude_keywords:
+                project_name = detail.project_name or ""
+                should_skip = False
+                for keyword in exclude_keywords:
+                    if keyword in project_name:
+                        append_log("INFO", f"跳过项目: {project_name} (匹配过滤: {keyword})")
+                        self._update_progress(session, region_code, item.sendid)
+                        should_skip = True
+                        break
+                if should_skip:
+                    continue
 
             if len(detail.items) == 0:
                 empty_items_count += 1

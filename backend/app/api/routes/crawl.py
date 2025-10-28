@@ -21,7 +21,7 @@ task_manager = TaskManager()
 def start_crawl(payload: CrawlStartRequest, _: User = Depends(get_current_user)) -> CrawlStartResponse:
     if not payload.regions:
         raise HTTPException(status_code=400, detail="必须选择至少一个地区")
-    task_id = task_manager.submit(payload.mode, payload.regions)
+    task_id = task_manager.submit(payload.mode, payload.regions, payload.exclude_keywords)
     return CrawlStartResponse(task_id=task_id)
 
 

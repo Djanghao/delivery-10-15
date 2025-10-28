@@ -21,6 +21,7 @@ class RegionNode(BaseModel):
 class CrawlStartRequest(BaseModel):
     mode: Literal["history", "incremental"]
     regions: List[str]
+    exclude_keywords: str = "分布式光伏"
 
 
 class CrawlStartResponse(BaseModel):

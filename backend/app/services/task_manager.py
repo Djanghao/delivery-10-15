@@ -35,9 +35,8 @@ class TaskManager:
         self._lock = threading.Lock()
         self._cancel_events: Dict[str, threading.Event] = {}
 
-    def submit(self, mode: str, regions: List[str]) -> str:
+    def submit(self, mode: str, regions: List[str], exclude_keywords: str = "") -> str:
         task_id = str(uuid.uuid4())
-        # Pre-allocate a run_id so UI can reference run immediately
         run_id = str(uuid.uuid4())
         info = TaskInfo(task_id=task_id, run_id=run_id, mode=mode, regions=list(regions))
         with self._lock:
@@ -49,12 +48,10 @@ class TaskManager:
             self._mark_running(task_id)
             try:
                 with session_scope() as session:
-                    # Pass in run_id and a stop-check for cooperative cancellation
                     run = self.crawler.run_task(
-                        session, mode, regions, run_id=run_id, should_stop=self._cancel_events[task_id].is_set
+                        session, mode, regions, run_id=run_id, should_stop=self._cancel_events[task_id].is_set, exclude_keywords=exclude_keywords
                     )
                     info.run_id = run.id
-                # If cancellation was requested, mark as cancelled
                 if self._cancel_events[task_id].is_set():
                     self._mark_cancelled(task_id)
                 else:
