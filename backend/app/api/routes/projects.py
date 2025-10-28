@@ -16,11 +16,35 @@ from ...schemas import (
     DeleteByRegionsResponse,
     DeleteProjectsRequest,
     PaginatedProjects,
+    ProjectCounts,
     ProjectFull,
     ProjectItem,
 )
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
+
+
+@router.get("/counts", response_model=ProjectCounts)
+def get_project_counts(
+    region: str | None = Query(default=None),
+    regions: List[str] = Query(default_factory=list),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+) -> ProjectCounts:
+    selected = regions or ([region] if region else [])
+    base_query = select(func.count()).select_from(ValuableProject)
+    if selected:
+        base_query = base_query.where(ValuableProject.region_code.in_(selected))
+
+    all_count = int(db.scalar(base_query) or 0)
+    parsed_count = int(db.scalar(base_query.where(ValuableProject.parsed_pdf == True)) or 0)
+    unparsed_count = int(db.scalar(base_query.where(ValuableProject.parsed_pdf == False)) or 0)
+
+    return ProjectCounts(
+        all=all_count,
+        parsed=parsed_count,
+        unparsed=unparsed_count,
+    )
 
 
 @router.get("", response_model=PaginatedProjects)

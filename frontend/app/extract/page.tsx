@@ -24,6 +24,12 @@ interface PaginatedProjects {
   size: number;
 }
 
+interface ProjectCounts {
+  all: number;
+  parsed: number;
+  unparsed: number;
+}
+
 interface ParseDetailItem {
   sendid: string;
   item_name: string;
@@ -44,6 +50,7 @@ export default function ExtractPage() {
   const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
   const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
   const [parsedFilter, setParsedFilter] = useState<'all' | 'parsed' | 'unparsed'>('all');
+  const [counts, setCounts] = useState<ProjectCounts>({ all: 0, parsed: 0, unparsed: 0 });
 
   const [captchaVisible, setCaptchaVisible] = useState(false);
   const [captchaImage, setCaptchaImage] = useState<string>('');
@@ -97,6 +104,17 @@ export default function ExtractPage() {
     return filtered.map((id) => regionNameMap[id] ?? id);
   }, [selectedRegions, regionNameMap, rootRegionIds]);
 
+  const loadCounts = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      selectedRegions.forEach((region) => params.append('regions', region));
+      const payload = await apiFetch<ProjectCounts>(`/api/projects/counts?${params.toString()}`);
+      setCounts(payload);
+    } catch {
+      setCounts({ all: 0, parsed: 0, unparsed: 0 });
+    }
+  }, [selectedRegions]);
+
   const loadProjects = useCallback(
     async (
       page = pagination.current ?? 1,
@@ -129,7 +147,7 @@ export default function ExtractPage() {
       message.warning('请选择需要查看的地区');
       return;
     }
-    await loadProjects(1, pagination.pageSize ?? 20);
+    await Promise.all([loadProjects(1, pagination.pageSize ?? 20), loadCounts()]);
   };
 
   const handleTableChange = async (pager: TablePaginationConfig) => {
@@ -227,7 +245,7 @@ export default function ExtractPage() {
           window.addEventListener('parse-step-finished', handler as EventListener);
         });
       }
-      await loadProjects(pagination.current ?? 1, pagination.pageSize ?? 20);
+      await Promise.all([loadProjects(pagination.current ?? 1, pagination.pageSize ?? 20), loadCounts()]);
     } catch (err) {
       message.error((err as Error).message || '解析失败');
     }
@@ -338,9 +356,9 @@ export default function ExtractPage() {
           activeKey={parsedFilter}
           onChange={handleTabChange}
           items={[
-            { key: 'all', label: '全部' },
-            { key: 'parsed', label: '已解析' },
-            { key: 'unparsed', label: '未解析' },
+            { key: 'all', label: `全部 (${counts.all}个)` },
+            { key: 'parsed', label: `已解析 (${counts.parsed}个)` },
+            { key: 'unparsed', label: `未解析 (${counts.unparsed}个)` },
           ]}
           style={{ marginBottom: 16 }}
         />

@@ -24,6 +24,12 @@ interface PaginatedProjects {
   size: number;
 }
 
+interface ProjectCounts {
+  all: number;
+  parsed: number;
+  unparsed: number;
+}
+
 type Mode = 'history' | 'incremental';
 
 export default function ResultsPage() {
@@ -36,6 +42,7 @@ export default function ResultsPage() {
   const [regionNameMap, setRegionNameMap] = useState<Record<string, string>>({});
   const [rootRegionIds, setRootRegionIds] = useState<Set<string>>(new Set());
   const [parsedFilter, setParsedFilter] = useState<'all' | 'parsed' | 'unparsed'>('all');
+  const [counts, setCounts] = useState<ProjectCounts>({ all: 0, parsed: 0, unparsed: 0 });
 
   const [detailVisible, setDetailVisible] = useState(false);
   const [selectedProjectUUID, setSelectedProjectUUID] = useState<string | null>(null);
@@ -76,6 +83,17 @@ export default function ResultsPage() {
     return filtered.map((id) => regionNameMap[id] ?? id);
   }, [selectedRegions, regionNameMap, rootRegionIds]);
 
+  const loadCounts = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      selectedRegions.forEach((region) => params.append('regions', region));
+      const payload = await apiFetch<ProjectCounts>(`/api/projects/counts?${params.toString()}`);
+      setCounts(payload);
+    } catch {
+      setCounts({ all: 0, parsed: 0, unparsed: 0 });
+    }
+  }, [selectedRegions]);
+
   const loadProjects = useCallback(
     async (
       page = pagination.current ?? 1,
@@ -108,7 +126,7 @@ export default function ResultsPage() {
       message.warning('请选择需要查看的地区');
       return;
     }
-    await loadProjects(1, pagination.pageSize ?? 20);
+    await Promise.all([loadProjects(1, pagination.pageSize ?? 20), loadCounts()]);
   };
 
   const handleTableChange = async (pager: TablePaginationConfig) => {
@@ -170,7 +188,7 @@ export default function ResultsPage() {
         method: 'DELETE',
       });
       message.success(`已删除 ${res.deleted} 条记录`);
-      await loadProjects(1, pagination.pageSize ?? 20);
+      await Promise.all([loadProjects(1, pagination.pageSize ?? 20), loadCounts()]);
     } finally {
       setDeleting(false);
     }
@@ -244,9 +262,9 @@ export default function ResultsPage() {
           activeKey={parsedFilter}
           onChange={handleTabChange}
           items={[
-            { key: 'all', label: '全部' },
-            { key: 'parsed', label: '已解析' },
-            { key: 'unparsed', label: '未解析' },
+            { key: 'all', label: `全部 (${counts.all}个)` },
+            { key: 'parsed', label: `已解析 (${counts.parsed}个)` },
+            { key: 'unparsed', label: `未解析 (${counts.unparsed}个)` },
           ]}
           style={{ marginBottom: 16 }}
         />

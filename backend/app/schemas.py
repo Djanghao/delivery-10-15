@@ -55,6 +55,12 @@ class PaginatedProjects(BaseModel):
     size: int
 
 
+class ProjectCounts(BaseModel):
+    all: int
+    parsed: int
+    unparsed: int
+
+
 class CrawlRunItem(BaseModel):
     id: str
     mode: str
